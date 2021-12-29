@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Home')
+@section('title', $title)
 
 @section('content')
     @include('home.header')

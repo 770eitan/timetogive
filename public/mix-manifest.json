@@ -1,4 +1,12 @@
 {
     "/js/app.js": "/js/app.js",
-    "/css/app.css": "/css/app.css"
+    "/css/app.css": "/css/app.css",
+    "/img/.DS_Store": "/img/.DS_Store",
+    "/img/dl.png": "/img/dl.png",
+    "/img/dl2.png": "/img/dl2.png",
+    "/img/dl3.png": "/img/dl3.png",
+    "/js/odometer.js": "/js/odometer.js",
+    "/js/odometer.min.js": "/js/odometer.min.js",
+    "/css/odometer-theme-car.css": "/css/odometer-theme-car.css",
+    "/css/animation.css": "/css/animation.css"
 }

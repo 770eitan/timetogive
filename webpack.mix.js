@@ -1,3 +1,4 @@
+const { copy } = require('laravel-mix');
 const mix = require('laravel-mix');
 
 /*
@@ -11,6 +12,12 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.js('resources/js/app.js', 'public/js')
+mix.
+copyDirectory('resources/img','public/img')
+copy('resources/js/odometer.js', 'public/js/')
+copy('resources/js/odometer.min.js', 'public/js/')
+copy('resources/css/odometer-theme-car.css', 'public/css/')
+copy('resources/css/animation.css', 'public/css/')
+.js('resources/js/app.js', 'public/js')
     .sass('resources/sass/app.scss', 'public/css')
     .sourceMaps();

@@ -1,0 +1,96 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Repositories\CharityTickerRepository;
+use App\Http\Requests\CreateCharitySearchRequest;
+use Illuminate\Http\Request;
+use Session;
+
+class HomeController extends Controller
+{
+
+    /**
+     * @var $charityTickerRepo
+     */
+    private $charityTickerRepo;
+
+    /**
+     * CharityTickerController Constructor
+     * @param CharityTickerRepository $charityTickerRepo
+     */
+    public function __construct(
+        CharityTickerRepository $charityTickerRepo
+    ) {
+        $this->charityTickerRepo = $charityTickerRepo;
+    }
+    /**
+     * Show home page
+     * @return \Illuminate\View\View
+     */
+    public function index()
+    {
+        return view('home', ['title' => 'Home', 'organizations' => $this->charityTickerRepo->getOrgList()]);
+    }
+
+    /**
+     * Show the thank you page after charity
+     *
+     * @return \Illuminate\View\View
+     */
+    public function thankyou(Request $request, $charity_code)
+    {
+        try {
+            $codeDetails = $this->charityTickerRepo->getCharityDetailsByCode($charity_code);
+            return view('thankyou', ['title' => 'Thank You', 'charity' => $codeDetails]);
+        } catch (\Exception $exception) {
+            return redirect()->route('home')->withError(config('message.invalid_ch'));
+        }
+    }
+
+    /**
+     * Verify user and set password
+     *
+     * @return \Illuminate\View\View
+     */
+    public function verify(Request $request, $token)
+    {
+        try {
+            $user = $this->charityTickerRepo->verifyUserFromEmailToken($token);
+            return redirect()->route('charity', ['charity_code' => $user->charity_ticker->charity_code]);
+        } catch (\Exception $exception) {
+            return redirect()->route('home')->withError(config('message.invalid_ch'));
+        }
+    }
+
+    /**
+     * Show the charity detail page
+     *
+     * @return \Illuminate\View\View
+     */
+    public function charityDetails(Request $request, $charity_code)
+    {
+        try {
+            $codeDetails = $this->charityTickerRepo->verifyUserFromCharityCode($charity_code);
+            return view('charity', ['title' => 'View Charity ' . $codeDetails->charity_code, 'charity' => $codeDetails, 'user' => $codeDetails->user]);
+        } catch (\Exception $exception) {
+            return redirect()->route('home')->withError(config('message.invalid_ch'));
+        }
+    }
+
+    /**
+     * Show the charity detail page
+     *
+     * @return \Illuminate\View\View
+     */
+    public function charitySearch(CreateCharitySearchRequest $request)
+    {
+        try {
+            $codeDetails = $this->charityTickerRepo->verifyUserWithCode($request->only(['s_email', 's_password', 's_code']));
+            return redirect()->route('charity', ['charity_code' => $codeDetails->charity_ticker->charity_code]);
+        } catch (\Exception $exception) {
+            Session::flash('s_message', config('message.invalid_ch'));
+            return redirect()->back()->withInput();
+        }
+    }
+}

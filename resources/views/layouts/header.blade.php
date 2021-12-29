@@ -10,5 +10,9 @@
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+  <script src="https://js.stripe.com/v3/"></script>
+  <script src="{{ asset('js/app.js') }}"></script>
+  @stack('styles')
+  @stack('scripts')
 </head>
 @include('layouts.nav')

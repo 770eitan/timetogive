@@ -12,12 +12,14 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.
-copyDirectory('resources/img','public/img')
-copy('resources/js/odometer.js', 'public/js/')
-copy('resources/js/odometer.min.js', 'public/js/')
-copy('resources/css/odometer-theme-car.css', 'public/css/')
-copy('resources/css/animation.css', 'public/css/')
+mix
+.copyDirectory('resources/img','public/img')
+.copyDirectory('resources/datepicker','public/datepicker')
+.copy('resources/js/odometer.js', 'public/js/')
+.copy('resources/js/odometer.min.js', 'public/js/')
+.copy('resources/css/odometer-theme-car.css', 'public/css/')
+.copy('resources/css/animation.css', 'public/css/')
+copy('resources/js/jquery.min.js','public/js/')
 .js('resources/js/app.js', 'public/js')
     .sass('resources/sass/app.scss', 'public/css')
     .sourceMaps();

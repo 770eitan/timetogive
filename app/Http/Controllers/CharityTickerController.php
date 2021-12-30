@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Repositories\CharityTickerRepository;
 use App\Http\Requests\CreateCharityTickerRequest;
-
+use Illuminate\Http\Request;
 class CharityTickerController extends Controller
 {
 
@@ -32,11 +32,25 @@ class CharityTickerController extends Controller
     public function store(CreateCharityTickerRequest $request)
     {
         try {
-          $code = $this->charityTickerRepo->saveTickerNUser($request->all());
-          return redirect()->route('thankyou', ['charity_code' => $code]);
+            $code = $this->charityTickerRepo->saveTickerNUser($request);
+            return redirect()->route('thankyou', ['charity_code' => $code]);
         } catch (\Exception $exception) {
             return back()->withError($exception->getMessage())->withInput();
         }
-        
+
+    }
+
+    public function checkTimerExpire(Request $request, $charity_code)
+    {
+        try {
+            $code = $this->charityTickerRepo->checkAutoStopTimer($charity_code);
+            return response()->json($code);
+        } catch (\Exception $exception) {
+            return response([
+                'ok' => false,
+                'error' => true,
+                'message' => 'Error occurred.',
+            ], 500);
+        }
     }
 }

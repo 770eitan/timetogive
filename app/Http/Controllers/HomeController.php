@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Repositories\CharityTickerRepository;
 use App\Http\Requests\CreateCharitySearchRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Session;
 
 class HomeController extends Controller
@@ -30,6 +31,9 @@ class HomeController extends Controller
      */
     public function index()
     {
+        if (Auth::user()) {
+            Auth::logout();
+        }
         return view('home', ['title' => 'Home', 'organizations' => $this->charityTickerRepo->getOrgList()]);
     }
 
@@ -41,6 +45,9 @@ class HomeController extends Controller
     public function thankyou(Request $request, $charity_code)
     {
         try {
+            if (Auth::user()) {
+                Auth::logout();
+            }
             $codeDetails = $this->charityTickerRepo->getCharityDetailsByCode($charity_code);
             return view('thankyou', ['title' => 'Thank You', 'charity' => $codeDetails]);
         } catch (\Exception $exception) {
@@ -91,6 +98,16 @@ class HomeController extends Controller
         } catch (\Exception $exception) {
             Session::flash('s_message', config('message.invalid_ch'));
             return redirect()->back()->withInput();
+        }
+    }
+
+    public function stopCharity(Request $request, $charity_code)
+    {
+        try {
+            $codeDetails = $this->charityTickerRepo->stopUserCharity($charity_code);
+            return redirect()->route('charity', ['charity_code' => $codeDetails->charity_ticker->charity_code]);
+        } catch (\Exception $exception) {
+            return redirect()->route('home')->withError(config('message.invalid_ch'));
         }
     }
 }

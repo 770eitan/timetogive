@@ -2,17 +2,21 @@
 
 namespace App\Http\Repositories;
 
+use App\Mail\EmailVerify;
+use App\Mail\UserPassword;
 use App\Models\CharityOrganization;
 use App\Models\CharityTicker;
 use App\Models\User;
+use Carbon\Carbon;
 use Cartalyst\Stripe\Stripe;
 use Collegeman\Fuerte\Fuerte;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\EmailVerify;
-use App\Mail\UserPassword;
+use Illuminate\Support\Str;
+use App\Events\VerifyEmailEvent;
+use App\Events\UserPasswordEmailEvent;
 class CharityTickerRepository
 {
 
@@ -22,10 +26,11 @@ class CharityTickerRepository
      * @param  array  $data
      * @return array
      */
-    public function saveTickerNUser(array $data)
+    public function saveTickerNUser($request)
     {
         DB::beginTransaction();
         try {
+            $data = $request->all();
             // Create user on stripe
             $stripe = Stripe::make(config('services.stripe.secret'));
             $customer = $stripe->customers()->create([
@@ -49,11 +54,15 @@ class CharityTickerRepository
             // Create user charity ticker
             $charityTicker = new CharityTicker;
             $charityTicker->user_id = $userId;
+            if(!$request->has('hasSubscribed')){
+              $charityTicker->timer_expiry_timestamp=Carbon::createFromFormat('Y/m/d H:i', $data['timer_expiry_timestamp'])->format('Y-m-d H:i:s'); // user entered datetime - converted to timestamp
+            }
             $charityTicker->fill($data);
             $charityTicker->save();
             DB::commit();
             $details = $this->getCharityInfoById($charityTicker->id);
-            Mail::to($user->email)->send(new EmailVerify($user));
+            VerifyEmailEvent::dispatch($user);
+            //Mail::to($user->email)->send(new EmailVerify($user));
             return $details->charity_code;
         } catch (ValidationException $e) {
             DB::rollback();
@@ -102,8 +111,8 @@ class CharityTickerRepository
     public function verifyUserWithCode(array $data)
     {
         $code = $data['s_code'];
-        $userDetails = User::where(['email' => $data['s_email'], 'status' => 1])->whereHas('charity_ticker',function ($q) use ($code) {
-          return $q->where('charity_code', $code);
+        $userDetails = User::where(['email' => $data['s_email'], 'status' => 1])->whereHas('charity_ticker', function ($q) use ($code) {
+            return $q->where('charity_code', $code);
         })->first();
 
         if (!$userDetails || !Hash::check($data['s_password'], $userDetails->password)) {
@@ -120,21 +129,30 @@ class CharityTickerRepository
     public function verifyUserFromEmailToken($token)
     {
         $user = User::where(['email_verify_token' => $token, 'status' => 0])->first();
+        
         if (!$user) {
             throw new \ErrorException(config('message.invalid_ch'));
         }
-        
+        // get charity details
+        $charityDt = CharityTicker::where(['user_id' => $user->id])->first();
+        if (!$charityDt) {
+            throw new \ErrorException(config('message.search_err'));
+        }
         $userId = $user->id;
         $password = Fuerte::make();
-        $user->status=1;
-        $user->email_verify_token=null;
-        $user->email_verified_at=now();
-        $user->password=Hash::make($password);
+        $user->status = 1;
+        $user->email_verify_token = null;
+        $user->email_verified_at = now();
+        $user->password = Hash::make($password);
         $user->save();
-        Mail::to($user->email)->send(new UserPassword($user,$password));
+
+        $charityDt->timer_start = now();
+        $charityDt->save();
+
+        UserPasswordEmailEvent::dispatch($user, $password);
+        //Mail::to($user->email)->send(new UserPassword($user, $password));
         return User::where(['id' => $userId, 'status' => 1])->whereHas('charity_ticker')->first();
     }
-
 
     /**
      * Verify user with email token
@@ -142,15 +160,92 @@ class CharityTickerRepository
      * @return Collection User
      */
     public function verifyUserFromCharityCode($charity_code)
-    { 
+    {
         $charityDt = CharityTicker::where('charity_code', $charity_code)
-        ->whereHas('user',function($q){
-          return $q->where(['status'=>1]);
-        })
-        ->first();
+            ->whereHas('user', function ($q) {
+                return $q->where(['status' => 1]);
+            })
+            ->with(['charity_organization'])
+            ->first();
         if (!$charityDt) {
             throw new \ErrorException(config('message.invalid_ch'));
         }
+        // Setup user session for stopping the charity timer
+        Auth::loginUsingId($charityDt->user_id);
         return $charityDt;
+    }
+
+    /**
+     * Stop user charity
+     *
+     * @return Collection CharityTicker
+     */
+    public function stopUserCharity($charity_code)
+    {
+        DB::beginTransaction();
+        try {
+            $user = Auth::user();
+            $userId = $user->id;
+            $charityDt = CharityTicker::where(['charity_code' => $charity_code, 'user_id' => $userId])->first();
+            if (!$charityDt) {
+                throw new \ErrorException(config('message.search_err'));
+            }
+            $time = now();
+            $timer_start = $charityDt->timer_start;
+            if (!$timer_start) {
+                $timer_start = $user->email_verified_at;
+                $charityDt->timer_start = $timer_start;
+            }
+            $charityDt->timer_completed_at = $time;
+            $charityDt->total_donation_amount = calTotalDonationAmount($timer_start, $time, $charityDt->donation_amount, $charityDt->tick_frequency, $charityDt->tick_frequency_unit);
+            $charityDt->save();
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            dd($e);
+            DB::rollback();
+            throw $e;
+        }
+    }
+
+    /**
+     * Check expiry time and Stop user charity
+     *
+     * @return boolean
+     */
+    public function checkAutoStopTimer($charity_code)
+    {
+        try {
+            $user = Auth::user();
+            $userId = $user->id;
+            $charityDt = CharityTicker::where(['charity_code' => $charity_code, 'user_id' => $userId])->first();
+            if (!$charityDt) {
+                throw new \ErrorException(config('message.search_err'));
+            }
+            // If user entered expiry time and its not completed
+            $timeText=  '';
+            if ($charityDt->timer_expiry_timestamp && !$charityDt->timer_completed_at) {
+                $time = now();
+                // echo $charityDt->timer_expiry_timestamp;
+                // echo '--';
+                // echo $time;
+                $startDate = Carbon::parse($charityDt->timer_expiry_timestamp);
+                $endDate = Carbon::parse($time);
+                if(!$startDate->gt($endDate)) {
+                  $this->stopUserCharity($charity_code);
+                  return [
+                    'ok'=>false,
+                    'timeText' => 0
+                  ];
+                }
+                $timeText = getRemainingTime($charityDt->timer_expiry_timestamp);
+            }
+            return [
+              'ok'=>true,
+              'timeText' => $timeText
+            ];
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 }

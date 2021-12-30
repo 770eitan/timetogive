@@ -2,11 +2,17 @@
     "/js/app.js": "/js/app.js",
     "/css/app.css": "/css/app.css",
     "/img/.DS_Store": "/img/.DS_Store",
+    "/img/charity.png": "/img/charity.png",
     "/img/dl.png": "/img/dl.png",
     "/img/dl2.png": "/img/dl2.png",
     "/img/dl3.png": "/img/dl3.png",
+    "/datepicker/jquery.datetimepicker.full.js": "/datepicker/jquery.datetimepicker.full.js",
+    "/datepicker/jquery.datetimepicker.full.min.js": "/datepicker/jquery.datetimepicker.full.min.js",
+    "/datepicker/jquery.datetimepicker.min.css": "/datepicker/jquery.datetimepicker.min.css",
+    "/datepicker/jquery.datetimepicker.min.js": "/datepicker/jquery.datetimepicker.min.js",
     "/js/odometer.js": "/js/odometer.js",
     "/js/odometer.min.js": "/js/odometer.min.js",
     "/css/odometer-theme-car.css": "/css/odometer-theme-car.css",
-    "/css/animation.css": "/css/animation.css"
+    "/css/animation.css": "/css/animation.css",
+    "/js/jquery.min.js": "/js/jquery.min.js"
 }

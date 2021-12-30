@@ -33,6 +33,7 @@ class CreateCharityTickerRequest extends FormRequest
             'tick_frequency' => 'required|integer',
             'tick_frequency_unit' => ['required', Rule::in(['kdei', 'mins', 'hours', 'days'])],
             'stripe_token' => 'required',
+            'timer_expiry_timestamp' => 'required_without:hasSubscribed|date_format:Y/m/d H:i'
         ];
     }
 
@@ -50,6 +51,8 @@ class CreateCharityTickerRequest extends FormRequest
             'donation_amount.min' => 'Minimum donation amount is 0.01',
             'tick_frequency.integer' => 'Please enter a valid numeric value',
             'stripe_token.required' => 'Please enter a valid payment.',
+            'timer_expiry_timestamp.required_without' => 'Please choose expiry date.',
+            'timer_expiry_timestamp.date_format' => 'Please enter a valid format(YYYY/MM/DD HH:SS).'
         ];
     }
 }

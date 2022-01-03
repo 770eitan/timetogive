@@ -13,13 +13,13 @@
     $totalAmount = calTotalDonationAmount($timer_start, $isCom ? $charity->timer_completed_at : now(), $charity->donation_amount, $charity->tick_frequency, $charity->tick_frequency_unit);
     @endphp
     <div class="position-relative overflow-hidden bg-light">
-        <div class="col-md-5 p-lg-5 mx-auto my-2">
+        {{-- <div class="col-md-5 p-lg-5 mx-auto my-2">
             <h1 class="display-4 fw-normal">Punny headline</h1>
             <p class="lead fw-normal">And an even wittier subheading to boot. Jumpstart your marketing efforts with this
                 example based on Apple’s marketing pages.</p>
             <a class="btn btn-outline-secondary" href="#">Coming soon</a>
         </div>
-        <hr class="my-4 my-3 ">
+        <hr class="my-4 my-3 "> --}}
         @if (session('error'))
             <div class="alert alert-danger" role="alert">
                 {{ session('error') }}
@@ -27,7 +27,7 @@
         @endif
         <div class="row" style="min-height: 180px; position:relative;">
             @if (!$charity->timer_completed_at)
-                <div style="overflow:hidden;top:50px;left: 250px;display:none; position: absolute;" id="animate-el"
+                <div style="overflow:hidden;top:50px;left:calc(100% - 80%);display:none; position: absolute;" id="animate-el"
                     class="animation-target text-center">
                     <img src="{{ asset('img/dl.png') }}" style="width: 47px;" alt="dollar">
                 </div>
@@ -153,8 +153,8 @@
 
             // Setup remaining time
             // Update the count down every 1 second
+            @if($charity->timer_expiry_timestamp)
             let countDownDate = new Date("{{ date('c',strtotime($charity->timer_expiry_timestamp)) }}").getTime();
-            //var distance = {{getRemainingTime($charity->timer_expiry_timestamp,true)}}*1000;
             var ctTimer = setInterval(function() {
 
                 // Get today's date and time
@@ -180,7 +180,7 @@
                     document.getElementById("expiry_time").innerHTML = "Completed";
                 }
             }, 1000);
-
+            @endif
 
             let text1 = document.getElementById('dl');
             let donation_amount = {{ $charity->donation_amount }};
@@ -245,12 +245,15 @@
                     if (ell.style.visibility === 'hidden') {
                         ell.style.visibility = '';
                     }
-                    var ell = document.getElementById("animate-el");
-                    ell.style.display = '';
                     count.innerHTML = lastVal;
-                    setTimeout(() => {
-                        ell.style.display = 'none';
-                    }, (TIME_LIMIT <= 3 ? 5000 : 4000));
+                    if(window.screen.width > 768) {
+                      var ell = document.getElementById("animate-el");
+                      ell.style.display = '';
+                      
+                      setTimeout(() => {
+                          ell.style.display = 'none';
+                      }, (TIME_LIMIT <= 3 ? 5000 : 4000));
+                    }
                 }
 
                 function bounceCoin() {

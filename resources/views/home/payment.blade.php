@@ -1,5 +1,5 @@
-<hr class="my-4 my-5 ">
-<div class="row">
+{{-- <hr class="my-4 my-5 "> --}}
+<div class="row my-4 my-5">
     <div class="col-md-12">
         <div class="text-center">
             <h1 class="display-8 fw-bold">Time To Give !</h1>
@@ -13,11 +13,10 @@
     </div>
 @endif
 <div class="row g-5 mt-5" id="payment">
-    <div class="col-sm-12 col-md-5 col-lg-5">
+    <div class="col-sm-12 col-md-12 col-lg-5 d-md-none d-lg-block">
         <img src="{{ asset('/img/charity.png') }}" alt="" style="width: 400px">
-
     </div>
-    <div class="col-sm-12 col-md-7 col-lg-7">
+    <div class="col-sm-12 col-md-12 col-lg-7">
         <div class="shadow p-3 mb-5 bg-white rounded">
             <div class="card-body">
                 <h2 class="mb-3">Billing Info</h2>
@@ -26,7 +25,7 @@
                     style="position: relative">
                     @csrf
                     <div class="row g-3">
-                        <div class="col-sm-6">
+                        <div class="col-sm-12 col-md-6">
                             <label for="first_name" class="form-label">First name</label>
                             <input type="text" name="first_name" id="first_name"
                                 class="form-control @error('first_name') is-invalid @enderror" placeholder="John"
@@ -35,7 +34,7 @@
                                 @include('shared.error',['message'=>$message])
                             @enderror
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-12 col-md-6">
                             <label for="last_name" class="form-label">Last name</label>
                             <input type="text" name="last_name" id="last_name"
                                 class="form-control @error('last_name') is-invalid @enderror" placeholder="Doe"
@@ -44,7 +43,7 @@
                                 @include('shared.error',['message'=>$message])
                             @enderror
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-12 col-md-6">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" name="email" id="email" value="{{ old('email') }}"
                                 class="form-control @error('email') is-invalid @enderror" placeholder="you@example.com"
@@ -113,11 +112,11 @@
                             @enderror
                         </div>
 
-                        <div class="col-sm-6 col-md-6">
+                        <div class="col-sm-12 col-md-6">
                             <div class="form-check">
-                                <label for="first_name" class="form-label">&nbsp;</label>
+                                <label for="hasSubscribed" class="form-label">&nbsp;</label>
                             </div>
-                            <div class="form-check">
+                            <div class="form-check" title="Continue the charity until stopped">
                                 <input class="form-check-input" name="hasSubscribed" id="hasSubscribed" type="checkbox"
                                     value="1" @if (!old('timer_expiry_timestamp')) checked="checked" @endif>
                                 <label class="form-check-label" for="hasSubscribed">
@@ -125,20 +124,18 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="vl"></div>
-                        <div class="col-sm-6 col-md-6">
-                            <div class="form-check">
-                                <label for="first_name" class="form-label">Expiry Time</label>
-                                <input type="text" @if (!old('timer_expiry_timestamp')) disabled @endif name="timer_expiry_timestamp"
-                                    id="datetimepicker"
-                                    class="form-control @error('timer_expiry_timestamp') is-invalid @enderror"
-                                    placeholder="2014/03/15 15:06" value="{{ old('timer_expiry_timestamp') }}">
-                                @error('timer_expiry_timestamp')
-                                    @include('shared.error',['message'=>$message])
-                                @enderror
-                            </div>
+                        {{-- <div class="vl d-md-none d-lg-block"></div> --}}
+                        <div class="col-sm-12 col-md-6">
+                            <label for="first_name" class="form-label">Expiry Time</label>
+                            <input type="text" @if (!old('timer_expiry_timestamp')) disabled @endif name="timer_expiry_timestamp"
+                                id="datetimepicker"
+                                class="form-control @error('timer_expiry_timestamp') is-invalid @enderror"
+                                placeholder="2014/03/15 15:06" value="{{ old('timer_expiry_timestamp') }}" title="Choose a date time to expire the charity">
+                            @error('timer_expiry_timestamp')
+                                @include('shared.error',['message'=>$message])
+                            @enderror
                         </div>
-                        <div class="col-sm-12 col-md-8">
+                        <div class="col-sm-12 col-md-12 col-lg-6">
                             <div class="form-group">
                                 <label for="card-element">Credit Card</label>
                                 <div id="card-element">

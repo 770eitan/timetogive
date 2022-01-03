@@ -1,5 +1,17 @@
 <?php
 use Carbon\Carbon;
+if (!function_exists('isHomePage')) {
+  // Check if current route is home page
+  function isHomePage($custom='',$with='or')
+  {
+      if($custom && $with) {
+        if($with=='or'){
+          return Route::current()->getName() == 'home' or Route::current()->getName() == $custom;
+        }
+      }
+      return Route::current()->getName() == 'home';
+  }
+}
 if (!function_exists('getSecondsFromTick')) {
     // this function return days, hours, mins to seconds (in javascript time)
     function getSecondsFromTick($tick_frequency, $tick_frequency_unit)

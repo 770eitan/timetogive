@@ -18,7 +18,7 @@
             <h1 class="display-4 fw-normal">Punny headline</h1>
             <p class="lead fw-normal">And an even wittier subheading to boot. Jumpstart your marketing efforts with this
                 example based on Apple’s marketing pages.</p>
-            <a class="btn btn-outline-secondary" href="{{ route('home').'#payment' }}">Start Another One</a>
+            <a class="btn btn-outline-secondary" href="{{ route('home') . '#payment' }}">Start Another One</a>
         </div>
         <hr class="my-4 my-3 ">
         @if (session('error'))
@@ -28,8 +28,8 @@
         @endif
         <div class="row" style="min-height: 180px; position:relative;">
             @if (!$charity->timer_completed_at)
-                <div style="overflow:hidden;top:50px;left:calc(100% - 80%);display:none; position: absolute;" id="animate-el"
-                    class="animation-target text-center">
+                <div style="overflow:hidden;top:50px;left:calc(100% - 80%);display:none; position: absolute;"
+                    id="animate-el" class="animation-target text-center">
                     <img src="{{ asset('img/dl.png') }}" style="width: 47px;" alt="dollar">
                 </div>
                 <div class="col-md-8 text-center" id="timer"></div>
@@ -41,16 +41,17 @@
                 <div class="col-md-6 col-sm-12 text-left">
                     <ul class="list-group">
                         <li class="list-group-item">
-                            <strong>Start:</strong> <span data-time="{{$timer_start}}" class="format-time"></span>
+                            <strong>Start:</strong> <span data-time="{{ $timer_start }}" class="format-time"></span>
                         </li>
                         <li class="list-group-item">
-                            <strong>End:</strong> <span data-time="{{$charity->timer_completed_at}}" class="format-time"></span>
+                            <strong>End:</strong> <span data-time="{{ $charity->timer_completed_at }}"
+                                class="format-time"></span>
                         </li>
                         <li class="list-group-item">
                             <strong>Amount:</strong> {!! formatDonationAmountText($charity->donation_amount, $charity->tick_frequency, $charity->tick_frequency_unit, $charity->charity_organization) !!}
                         </li>
                         <li class="list-group-item">
-                            <strong>Total Amount:</strong> $ {{ $charity->total_donation_amount }}
+                            <strong>Total Amount:</strong> $ {{ number_format($charity->total_donation_amount,2) }}
                         </li>
                     </ul>
                 </div>
@@ -154,39 +155,46 @@
     <script>
         window.addEventListener("load", function() {
 
+            async function checkIsTimerExpire() {
+                let charity_code = "{{ $charity->charity_code }}";
+                await axios.get(`/check-timer/${charity_code}?tm=${moment().utcOffset()}`)
+                    .then(res => {
+                        //document.getElementById('expiry_time').innerHTML = res.data.timeText;
+                        if (res.data && res.data.ok == true) {
+                            window.location.reload();
+                        }
+                    })
+                    .catch(err => console.log(err));
+            }
+
             // Setup remaining time
             // Update the count down every 1 second
-            @if($charity->timer_expiry_timestamp)
-              //let countDownDate = new Date("{{ date('c',strtotime($charity->timer_expiry_timestamp)) }}").getTime();
-              let countDownDate = moment("{{$charity->timer_expiry_timestamp}}").valueOf();
-              var ctTimer = setInterval(function() {
-
-                  // Get today's date and time
-                  // Find the distance between now and the count down date
-                  // Get today's date and time
-                  //var now = new Date().getTime();
-                  var now=moment().valueOf();
-                    
-                    // Find the distance between now and the count down date
-                  var distance = countDownDate - now;
-                  // Time calculations for days, hours, minutes and seconds
-                  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                  
-                  // Output the result in an element with id="demo"
-                  document.getElementById("expiry_time").innerHTML = days + "d " + hours + "h " +
-                      minutes + "m " + seconds + "s ";
-
-                  // If the count down is over, write some text 
-                  if (distance < 0) {
-                      clearInterval(ctTimer);
-                      document.getElementById("expiry_time").innerHTML = "Completed";
-                      checkIsTimerExpire();
-                  }
-              }, 1000);
-            @endif
+            @if ($charity->timer_expiry_timestamp)
+                //let countDownDate = new Date("{{ date('c', strtotime($charity->timer_expiry_timestamp)) }}").getTime();
+                let countDownDate = moment("{{ $charity->timer_expiry_timestamp }}").valueOf();
+                var ctTimer = setInterval(function() {
+            
+                // Get today's date and time
+                // Find the distance between now and the count down date
+                // Get today's date and time
+                //var now = new Date().getTime();
+                var now=moment().valueOf();
+            
+                // Find the distance between now and the count down date
+                var distance = countDownDate - now;
+                // Time calculations for days, hours, minutes and seconds
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+                // Output the result in an element with id="demo"
+                document.getElementById("expiry_time").innerHTML = days + "d " + hours + "h " +
+                minutes + "m " + seconds + "s ";
+            
+                // If the count down is over, write some text
+                if (distance < 0) { clearInterval(ctTimer); document.getElementById("expiry_time").innerHTML="Completed" ;
+                    checkIsTimerExpire(); } }, 1000); @endif
 
             let text1 = document.getElementById('dl');
             let donation_amount = {{ $charity->donation_amount }};
@@ -251,13 +259,13 @@
                         ell.style.visibility = '';
                     }
                     count.innerHTML = lastVal;
-                    if(window.screen.width > 768) {
-                      var ell = document.getElementById("animate-el");
-                      ell.style.display = '';
-                      
-                      setTimeout(() => {
-                          ell.style.display = 'none';
-                      }, (TIME_LIMIT <= 3 ? 5000 : 4000));
+                    if (window.screen.width > 768) {
+                        var ell = document.getElementById("animate-el");
+                        ell.style.display = '';
+
+                        setTimeout(() => {
+                            ell.style.display = 'none';
+                        }, (TIME_LIMIT <= 3 ? 5000 : 4000));
                     }
                 }
 
@@ -328,19 +336,6 @@
                         document.getElementById("timer")
                             .innerHTML = template;
                     }
-                }
-
-
-                async function checkIsTimerExpire() {
-                    let charity_code = "{{ $charity->charity_code }}";
-                    await axios.get(`/check-timer/${charity_code}?tm=${moment().utcOffset()}`)
-                        .then(res => {
-                            //document.getElementById('expiry_time').innerHTML = res.data.timeText;
-                            if (res.data && res.data.ok == false) {
-                                window.location.reload();
-                            }
-                        })
-                        .catch(err => console.log(err));
                 }
             }
         });

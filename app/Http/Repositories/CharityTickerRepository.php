@@ -225,11 +225,6 @@ class CharityTickerRepository
             $timeText = '';
             if ($charityDt->timer_expiry_timestamp && !$charityDt->timer_completed_at) {
                 $this->stopUserCharity($charity_code);
-                return [
-                    'ok' => false,
-                    'timeText' => 0,
-                ];
-
                 // $time = now();
                 // // echo $charityDt->timer_expiry_timestamp;
                 // // echo '--';

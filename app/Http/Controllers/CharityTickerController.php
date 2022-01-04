@@ -43,7 +43,7 @@ class CharityTickerController extends Controller
     public function checkTimerExpire(Request $request, $charity_code)
     {
         try {
-            $code = $this->charityTickerRepo->checkAutoStopTimer($charity_code);
+            $code = $this->charityTickerRepo->checkAutoStopTimer($charity_code,$request->input('tm'));
             return response()->json($code);
         } catch (\Exception $exception) {
             return response([

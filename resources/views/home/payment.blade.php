@@ -24,7 +24,7 @@
                 <form action="{{ route('createTick') }}" method="POST" autocomplete="off" id="paymentForm"
                     style="position: relative">
                     @csrf
-                    <div class="row g-3">
+                    <div class="row g-3" style="position: relative">
                         <div class="col-sm-12 col-md-6">
                             <label for="first_name" class="form-label">First name</label>
                             <input type="text" name="first_name" id="first_name"
@@ -113,7 +113,7 @@
                         </div>
 
                         <div class="col-sm-12 col-md-6">
-                            <div class="form-check">
+                            <div class="form-check d-none d-sm-none d-md-none d-lg-block">
                                 <label for="hasSubscribed" class="form-label">&nbsp;</label>
                             </div>
                             <div class="form-check" title="Continue the charity until stopped">
@@ -124,18 +124,22 @@
                                 </label>
                             </div>
                         </div>
+                        {{-- <div class="col-sm-12 col-md-12 text-center "> --}}
+                        <span class="divid">OR</span>
+                        {{-- </div> --}}
                         {{-- <div class="vl d-md-none d-lg-block"></div> --}}
                         <div class="col-sm-12 col-md-6">
                             <label for="first_name" class="form-label">Expiry Time</label>
                             <input type="text" @if (!old('timer_expiry_timestamp')) disabled @endif name="timer_expiry_timestamp"
                                 id="datetimepicker"
                                 class="form-control @error('timer_expiry_timestamp') is-invalid @enderror"
-                                placeholder="2014/03/15 15:06" value="{{ old('timer_expiry_timestamp') }}" title="Choose a date time to expire the charity">
+                                placeholder="2014/03/15 15:06" value="{{ old('timer_expiry_timestamp') }}"
+                                title="Choose a date time to expire the charity">
                             @error('timer_expiry_timestamp')
                                 @include('shared.error',['message'=>$message])
                             @enderror
                         </div>
-                        <div class="col-sm-12 col-md-12 col-lg-6">
+                        <div class="col-sm-12 col-md-12">
                             <div class="form-group">
                                 <label for="card-element">Credit Card</label>
                                 <div id="card-element">
@@ -225,8 +229,12 @@
                 onItemAdd: function() {
                     this.setTextboxValue('');
                     this.refreshOptions();
+                    setTimeout(() => {
+                        tomSelect.close();
+                        tomSelect.blur();
+                    }, 10);
                 },
-                persist: false,
+                //persist: false,
                 create: function(input, callback) {
                     const data = {
                         name: input

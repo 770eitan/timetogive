@@ -2,8 +2,8 @@
 
 namespace App\Http\Repositories;
 
-use App\Mail\EmailVerify;
-use App\Mail\UserPassword;
+use App\Events\UserPasswordEmailEvent;
+use App\Events\VerifyEmailEvent;
 use App\Models\CharityOrganization;
 use App\Models\CharityTicker;
 use App\Models\User;
@@ -15,8 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use App\Events\VerifyEmailEvent;
-use App\Events\UserPasswordEmailEvent;
+
 class CharityTickerRepository
 {
 
@@ -54,8 +53,8 @@ class CharityTickerRepository
             // Create user charity ticker
             $charityTicker = new CharityTicker;
             $charityTicker->user_id = $userId;
-            if(!$request->has('hasSubscribed')){
-              $charityTicker->timer_expiry_timestamp=Carbon::createFromFormat('Y/m/d H:i', $data['timer_expiry_timestamp'])->format('Y-m-d H:i:s'); // user entered datetime - converted to timestamp
+            if (!$request->has('hasSubscribed')) {
+                $charityTicker->timer_expiry_timestamp = Carbon::createFromFormat('Y/m/d H:i', $data['timer_expiry_timestamp'])->format('Y-m-d H:i:s'); // user entered datetime - converted to timestamp
             }
             $charityTicker->fill($data);
             $charityTicker->save();
@@ -129,7 +128,7 @@ class CharityTickerRepository
     public function verifyUserFromEmailToken($token)
     {
         $user = User::where(['email_verify_token' => $token, 'status' => 0])->first();
-        
+
         if (!$user) {
             throw new \ErrorException(config('message.invalid_ch'));
         }
@@ -213,7 +212,7 @@ class CharityTickerRepository
      *
      * @return boolean
      */
-    public function checkAutoStopTimer($charity_code)
+    public function checkAutoStopTimer($charity_code, $offset)
     {
         try {
             $user = Auth::user();
@@ -223,26 +222,32 @@ class CharityTickerRepository
                 throw new \ErrorException(config('message.search_err'));
             }
             // If user entered expiry time and its not completed
-            $timeText=  '';
+            $timeText = '';
             if ($charityDt->timer_expiry_timestamp && !$charityDt->timer_completed_at) {
-                $time = now();
-                // echo $charityDt->timer_expiry_timestamp;
-                // echo '--';
-                // echo $time;
-                $startDate = Carbon::parse($charityDt->timer_expiry_timestamp);
-                $endDate = Carbon::parse($time);
-                if(!$startDate->gt($endDate)) {
-                  $this->stopUserCharity($charity_code);
-                  return [
-                    'ok'=>false,
-                    'timeText' => 0
-                  ];
-                }
-                $timeText = getRemainingTime($charityDt->timer_expiry_timestamp);
+                $this->stopUserCharity($charity_code);
+                return [
+                    'ok' => false,
+                    'timeText' => 0,
+                ];
+
+                // $time = now();
+                // // echo $charityDt->timer_expiry_timestamp;
+                // // echo '--';
+                // // echo $time;
+                // $startDate = Carbon::parse($charityDt->timer_expiry_timestamp);
+                // $endDate = Carbon::parse($time);
+                // if(!$startDate->gt($endDate)) {
+                //   $this->stopUserCharity($charity_code);
+                //   return [
+                //     'ok'=>false,
+                //     'timeText' => 0
+                //   ];
+                // }
+                // $timeText = getRemainingTime($charityDt->timer_expiry_timestamp);
             }
             return [
-              'ok'=>true,
-              'timeText' => $timeText
+                'ok' => true,
+                'timeText' => $timeText,
             ];
         } catch (\Exception $e) {
             throw $e;

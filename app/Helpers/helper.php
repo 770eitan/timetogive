@@ -1,16 +1,16 @@
 <?php
 use Carbon\Carbon;
 if (!function_exists('isHomePage')) {
-  // Check if current route is home page
-  function isHomePage($custom='',$with='or')
-  {
-      if($custom && $with) {
-        if($with=='or'){
-          return Route::current()->getName() == 'home' or Route::current()->getName() == $custom;
+    // Check if current route is home page
+    function isHomePage($custom = '', $with = 'or')
+    {
+        if ($custom && $with) {
+            if ($with == 'or') {
+                return Route::current()->getName() == 'home' or Route::current()->getName() == $custom;
+            }
         }
-      }
-      return Route::current()->getName() == 'home';
-  }
+        return Route::current()->getName() == 'home';
+    }
 }
 if (!function_exists('getSecondsFromTick')) {
     // this function return days, hours, mins to seconds (in javascript time)
@@ -43,13 +43,17 @@ if (!function_exists('calTotalDonationAmount')) {
         if ($timer_start && $timer_completed_at) {
             if ($tick_frequency_unit == 'kdei') {
                 // calculate total seconds spent and then multiply it by price
-                return round(((($tick_frequency * 3) * $data['s']) * $donation_amount), 2, PHP_ROUND_HALF_UP);
+                return (int) ($data['s'] / ($tick_frequency * 3)) * $donation_amount;
+                //return round(((($tick_frequency * 3) * $data['s']) * $donation_amount), 2, PHP_ROUND_HALF_UP);
             } else if ($tick_frequency_unit == 'mins') {
-                return round($data['m'] * $donation_amount, 2, PHP_ROUND_HALF_UP);
+                return (int) ($data['m'] / $tick_frequency) * $donation_amount;
+                //return round($data['m'] * $donation_amount, 2, PHP_ROUND_HALF_UP);
             } else if ($tick_frequency_unit == 'hours') {
-                return round($data['h'] * $donation_amount, 2, PHP_ROUND_HALF_UP);
+                return (int) ($data['h'] / $tick_frequency) * $donation_amount;
+                //return round($data['h'] * $donation_amount, 2, PHP_ROUND_HALF_UP);
             } else if ($tick_frequency_unit == 'days') {
-                return round($data['d'] * $donation_amount, 2, PHP_ROUND_HALF_UP);
+                return (int) ($data['d'] / $tick_frequency) * $donation_amount;
+                //return round($data['d'] * $donation_amount, 2, PHP_ROUND_HALF_UP);
             }
         } else {
             return 0;
@@ -68,13 +72,15 @@ if (!function_exists('formatTimeT')) {
 if (!function_exists('formatDonationAmountText')) {
     function formatDonationAmountText($donation_amount, $tick_frequency, $tick_frequency_unit, $charity_organization)
     {
-        $name = $charity_organization ? "for <b>{$charity_organization->name}</b>" : '';
-        return "$ <i>{$donation_amount}</i> Every {$tick_frequency}{$tick_frequency_unit} {$name}";
+        $name = $charity_organization ? "for organization <b>{$charity_organization->name}</b>" : '';
+        $sec = $tick_frequency_unit == 'kdei' ? $tick_frequency*3 : $tick_frequency;
+        $fqText = $tick_frequency_unit == 'kdei' ? "{$sec}Sec({$tick_frequency}xKedei Dibur)" : $tick_frequency_unit; 
+        return "$ <i>{$donation_amount}</i> Every {$fqText} {$name}";
     }
 }
 
 if (!function_exists('getRemainingTime')) {
-    function getRemainingTime($timer_expiry,$rt=false)
+    function getRemainingTime($timer_expiry, $rt = false)
     {
         $startDate = Carbon::parse($timer_expiry);
         $endDate = Carbon::parse(now());
@@ -85,8 +91,8 @@ if (!function_exists('getRemainingTime')) {
                 'm' => $startDate->diffInMinutes($endDate),
                 'd' => $startDate->diffInDays($endDate),
             ];
-            if($rt==true){
-              return $data['s'];
+            if ($rt == true) {
+                return $data['s'];
             }
             if ($data['d'] > 0) {
                 return "{$data['d']} Day(s)";

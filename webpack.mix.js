@@ -19,7 +19,8 @@ mix
 .copy('resources/js/odometer.min.js', 'public/js/')
 .copy('resources/css/odometer-theme-car.css', 'public/css/')
 .copy('resources/css/animation.css', 'public/css/')
-copy('resources/js/jquery.min.js','public/js/')
+.copy('resources/js/jquery.min.js','public/js/')
+.js('resources/js/timer.js', 'public/js')
 .js('resources/js/app.js', 'public/js')
     .sass('resources/sass/app.scss', 'public/css')
     .sourceMaps();

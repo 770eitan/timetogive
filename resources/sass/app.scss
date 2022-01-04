@@ -10,5 +10,133 @@
 @import '~tom-select/src/scss/tom-select.bootstrap5';
 
 body {
-  font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', sans-serif;
+}
+
+
+.divid {
+        color: #212529;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        bottom: 32%;
+        font-size: 12px;
+        width: 20%;
+        right: 40%;
+        font-weight: bold;
+        &::before,
+        &::after {
+            content: '';
+            display: block;
+            height: 0.07em;
+            width: 100%;
+        }
+
+        &::before {
+            // background: #ced4da;
+            // margin-right: 2vh;
+        }
+
+        &::after {
+            // background: #ced4da;
+            margin-left: 2vh;
+        }
+
+}
+@media (min-width: 996px) and (max-width: 1196px) {
+  .divid{
+    width: 100%;
+    right: 0;
+  }
+}
+@media (max-width: 765px) {
+  .divid{
+    bottom: 25%;
+    margin-bottom: 10px;
+    width: 100%;
+    right: 0;
+    &::before {
+      background: #ced4da;
+      margin-right: 2vh;
+  }
+
+  &::after {
+      background: #ced4da;
+      margin-left: 2vh;
+  }
+  }
+}
+
+.has-items .ts-control > input{
+  margin: 0 0px !important;
+}
+
+.fluid {
+  display: flex;
+  a {
+    flex-grow: 1;
+    margin-right: 0.25rem;
+  }
+  a:last-child {
+    margin-right: 0rem;
+  }
+}
+
+.btn-social,
+.btn-social:visited,
+.btn-social:focus,
+.btn-social:hover,
+.btn-social:active {
+  color: #ffffff;
+  text-decoration: none;
+  transition: opacity .15s ease-in-out;
+}
+
+.btn-social:hover,
+.btn-social:active {
+ opacity: .75;
+}
+
+.btn-fb {
+  background-color: #3b5998;
+}
+
+.btn-tw {
+  background-color: #1da1f2;
+}
+
+.btn-in {
+  background-color: #0077b5;
+}
+
+.btn-gp {
+  background-color: #db4437;
+}
+
+.btn-rd {
+  background-color: #ff4500;
+}
+
+.btn-hn {
+  background-color: #ff4000;
+}
+
+svg:not(:root).svg-inline--fa {
+  overflow: visible;
+}
+
+.svg-inline--fa.fa-w-14 {
+  width: 0.875em;
+}
+svg:not(:root) {
+  overflow: hidden;
+}
+
+.svg-inline--fa {
+  display: inline-block;
+  font-size: inherit;
+  height: 1em;
+  overflow: visible;
+  vertical-align: -0.125em;
 }

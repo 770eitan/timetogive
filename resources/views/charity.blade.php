@@ -13,13 +13,14 @@
     $totalAmount = calTotalDonationAmount($timer_start, $isCom ? $charity->timer_completed_at : now(), $charity->donation_amount, $charity->tick_frequency, $charity->tick_frequency_unit);
     @endphp
     <div class="position-relative overflow-hidden bg-light">
-        {{-- <div class="col-md-5 p-lg-5 mx-auto my-2">
+        @include('charity.social')
+        <div class="col-md-5 p-lg-5 mx-auto my-2">
             <h1 class="display-4 fw-normal">Punny headline</h1>
             <p class="lead fw-normal">And an even wittier subheading to boot. Jumpstart your marketing efforts with this
                 example based on Apple’s marketing pages.</p>
-            <a class="btn btn-outline-secondary" href="#">Coming soon</a>
+            <a class="btn btn-outline-secondary" href="{{ route('home').'#payment' }}">Start Another One</a>
         </div>
-        <hr class="my-4 my-3 "> --}}
+        <hr class="my-4 my-3 ">
         @if (session('error'))
             <div class="alert alert-danger" role="alert">
                 {{ session('error') }}
@@ -40,13 +41,13 @@
                 <div class="col-md-6 col-sm-12 text-left">
                     <ul class="list-group">
                         <li class="list-group-item">
-                            <strong>Start:</strong> {{ formatTimeT($timer_start) }}
+                            <strong>Start:</strong> <span data-time="{{$timer_start}}" class="format-time"></span>
                         </li>
                         <li class="list-group-item">
-                            <strong>End:</strong> {{ formatTimeT($charity->timer_completed_at) }}
+                            <strong>End:</strong> <span data-time="{{$charity->timer_completed_at}}" class="format-time"></span>
                         </li>
                         <li class="list-group-item">
-                            <strong>Amount:</strong> {!! formatDonationAmountText($charity->donation_amount, $charity->tick_frequency, $charity->tick_frequency_unit, null) !!}
+                            <strong>Amount:</strong> {!! formatDonationAmountText($charity->donation_amount, $charity->tick_frequency, $charity->tick_frequency_unit, $charity->charity_organization) !!}
                         </li>
                         <li class="list-group-item">
                             <strong>Total Amount:</strong> $ {{ $charity->total_donation_amount }}
@@ -147,39 +148,44 @@
 @endpush
 
 @push('scripts')
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/odometer.min.js') }}"></script>
+    <script src="{{ asset('js/timer.js') }}"></script>
     <script>
         window.addEventListener("load", function() {
 
             // Setup remaining time
             // Update the count down every 1 second
             @if($charity->timer_expiry_timestamp)
-            let countDownDate = new Date("{{ date('c',strtotime($charity->timer_expiry_timestamp)) }}").getTime();
-            var ctTimer = setInterval(function() {
+              //let countDownDate = new Date("{{ date('c',strtotime($charity->timer_expiry_timestamp)) }}").getTime();
+              let countDownDate = moment("{{$charity->timer_expiry_timestamp}}").valueOf();
+              var ctTimer = setInterval(function() {
 
-                // Get today's date and time
-                // Find the distance between now and the count down date
-                // Get today's date and time
-                var now = new Date().getTime();
-                  
+                  // Get today's date and time
                   // Find the distance between now and the count down date
-                var distance = countDownDate - now;
-                // Time calculations for days, hours, minutes and seconds
-                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                
-                // Output the result in an element with id="demo"
-                document.getElementById("expiry_time").innerHTML = days + "d " + hours + "h " +
-                    minutes + "m " + seconds + "s ";
+                  // Get today's date and time
+                  //var now = new Date().getTime();
+                  var now=moment().valueOf();
+                    
+                    // Find the distance between now and the count down date
+                  var distance = countDownDate - now;
+                  // Time calculations for days, hours, minutes and seconds
+                  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                  
+                  // Output the result in an element with id="demo"
+                  document.getElementById("expiry_time").innerHTML = days + "d " + hours + "h " +
+                      minutes + "m " + seconds + "s ";
 
-                // If the count down is over, write some text 
-                if (distance < 0) {
-                    clearInterval(ctTimer);
-                    document.getElementById("expiry_time").innerHTML = "Completed";
-                }
-            }, 1000);
+                  // If the count down is over, write some text 
+                  if (distance < 0) {
+                      clearInterval(ctTimer);
+                      document.getElementById("expiry_time").innerHTML = "Completed";
+                      checkIsTimerExpire();
+                  }
+              }, 1000);
             @endif
 
             let text1 = document.getElementById('dl');
@@ -188,7 +194,7 @@
             let allDonation = {{ $totalAmount }};
 
             let isCompeted = {{ $isCom }};
-            //const TIME_LIMIT = {{ getSecondsFromTick($charity->tick_frequency, $charity->tick_frequency_unit) }};
+            const TIME_LIMIT = {{ getSecondsFromTick($charity->tick_frequency, $charity->tick_frequency_unit) }};
             let count = document.getElementById('odometer');
 
             od = new Odometer({
@@ -209,12 +215,11 @@
                 }
             }
             if (!isCompeted) {
-                const TIME_LIMIT = 5;
                 let timePassed = 0;
                 let timeLeft = TIME_LIMIT;
                 let timerInterval = null;
                 formatTime(TIME_LIMIT);
-                checkIsTimerExpire();
+                //checkIsTimerExpire();
                 startTimer();
 
                 function animate(obj, initVal, lastVal, duration) {
@@ -262,7 +267,7 @@
 
                 function onTimesUp() {
                     clearInterval(timerInterval);
-                    checkIsTimerExpire();
+                    //checkIsTimerExpire();
                     timePassed = 0;
                     timeLeft = TIME_LIMIT;
                     timerInterval = null;
@@ -328,7 +333,7 @@
 
                 async function checkIsTimerExpire() {
                     let charity_code = "{{ $charity->charity_code }}";
-                    await axios.get(`/check-timer/${charity_code}`)
+                    await axios.get(`/check-timer/${charity_code}?tm=${moment().utcOffset()}`)
                         .then(res => {
                             //document.getElementById('expiry_time').innerHTML = res.data.timeText;
                             if (res.data && res.data.ok == false) {

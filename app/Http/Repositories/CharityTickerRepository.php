@@ -9,7 +9,6 @@ use App\Models\CharityTicker;
 use App\Models\User;
 use Carbon\Carbon;
 use Cartalyst\Stripe\Stripe;
-use Collegeman\Fuerte\Fuerte;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -138,7 +137,7 @@ class CharityTickerRepository
             throw new \ErrorException(config('message.search_err'));
         }
         $userId = $user->id;
-        $password = Fuerte::make();
+        $password = Illuminate\Support\Collection::times(4, fn() => Illuminate\Support\Str::random(5) )->join('-');
         $user->status = 1;
         $user->email_verify_token = null;
         $user->email_verified_at = now();

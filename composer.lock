@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "96e0a4cbfed6f437ddea75621db3ec74",
+    "content-hash": "60f2dd40441266988284b6ec6765d181",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -178,57 +178,6 @@
                 "source": "https://github.com/cartalyst/stripe/tree/v2.4.6"
             },
             "time": "2021-10-09T10:40:49+00:00"
-        },
-        {
-            "name": "collegeman/fuerte",
-            "version": "1.0.7",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/collegeman/fuerte.git",
-                "reference": "6da6b27b4f75fe6f7a278fd24945ebe8b85f7697"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/collegeman/fuerte/zipball/6da6b27b4f75fe6f7a278fd24945ebe8b85f7697",
-                "reference": "6da6b27b4f75fe6f7a278fd24945ebe8b85f7697",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.3"
-            },
-            "type": "wordpress-plugin",
-            "extra": {
-                "laravel": {
-                    "aliases": {
-                        "Fuerte": "Collegeman\\Fuerte\\Fuerte"
-                    }
-                },
-                "installer-paths": {
-                    "wp-content/mu-plugins/{$name}/": [
-                        "wpackagist-plugin/akismet"
-                    ],
-                    "wp-content/plugins/{$name}/": [
-                        "type:wordpress-plugin"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Collegeman\\Fuerte\\": "src/"
-                },
-                "files": [
-                    "src/helpers.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "support": {
-                "issues": "https://github.com/collegeman/fuerte/issues",
-                "source": "https://github.com/collegeman/fuerte/tree/1.0.7"
-            },
-            "time": "2020-12-24T20:57:56+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
@@ -8061,5 +8010,5 @@
         "php": "^7.3|^8.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "2.1.0"
 }

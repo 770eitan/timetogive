@@ -15,9 +15,8 @@
     <div class="position-relative overflow-hidden bg-light">
         @include('charity.social')
         <div class="col-md-5 p-lg-5 mx-auto my-2">
-            <h1 class="display-4 fw-normal">Punny headline</h1>
-            <p class="lead fw-normal">And an even wittier subheading to boot. Jumpstart your marketing efforts with this
-                example based on Apple’s marketing pages.</p>
+            <h1 class="display-4 fw-normal">TzedokoMeter</h1>
+            <p class="lead fw-normal">Your giving status: How much you've given, giving, and remaining to give until completion.</p>
             <a class="btn btn-outline-secondary" href="{{ route('home') . '#payment' }}">Start Another One</a>
         </div>
         <hr class="my-4 my-3 ">

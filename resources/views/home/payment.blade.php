@@ -19,8 +19,10 @@
     <div class="col-sm-12 col-md-12 col-lg-7">
         <div class="shadow p-3 mb-5 bg-white rounded">
             <div class="card-body">
+                {{--
                 <h2 class="mb-3">Billing Info</h2>
                 <hr class="mb-4 ">
+                --}}
                 <form action="{{ route('createTick') }}" method="POST" autocomplete="off" id="paymentForm"
                     style="position: relative">
                     @csrf

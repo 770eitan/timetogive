@@ -165,11 +165,20 @@ class CharityTickerRepository
         $user->password = Hash::make($password);
         $user->save();
 
+        $unittosec = [
+            'sec' => 1,
+            'mins' => 60,
+            'hours' => 60 * 60,
+            'days' => 60 * 60 * 24,
+        ];
+
         if (config('timetogive.mode')=='deposit') {
-            $charityDt->donation_amount
-            $charityDt->tick_frequency
-            $charityDt->tick_frequency_unit
-            $charityDt->timer_expiry_timestamp = Carbon::createFromFormat('Y/m/d H:i', $data['timer_expiry_timestamp'])->format('Y-m-d H:i:s'); // user entered datetime - converted to timestamp
+            $numcompletesteps = (int)($charityDt->total_donation_amount / $charityDt->donation_amount);
+            $remaindersteps = $charityDt->total_donation_amount % $charityDt->donation_amount;
+            $secondsbetweensteps = $charityDt->tick_frequency * $unittosec[$charityDt->tick_frequency_unit];
+            $completestepstotalseconds = $numsteps * $secondsbetweensteps;
+            $remainderstepstotalseconds = (int)($remaindersteps * $secondsbetweensteps);
+            $charityDt->timer_expiry_timestamp = now()->addSeconds($completestepstotalseconds + $remainderstepstotalseconds);
         } // for 'countup' we set timer_expiry_timestamp as user submitted by form
         $charityDt->timer_start = $now;
         $charityDt->save();

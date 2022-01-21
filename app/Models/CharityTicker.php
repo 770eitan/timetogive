@@ -20,7 +20,8 @@ class CharityTicker extends Model
         'donation_amount',
         'tick_frequency',
         'tick_frequency_unit',
-        'hasSubscribed',
+        'total_donation_amount',
+        'is_subscribed',
     ];
 
     /**
@@ -30,6 +31,7 @@ class CharityTicker extends Model
      */
     protected $casts = [
         'donation_amount' => 'double',
+        'total_donation_amount' => 'double',
     ];
 
     /**

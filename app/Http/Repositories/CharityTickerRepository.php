@@ -36,15 +36,11 @@ class CharityTickerRepository
                 'name' => $data['first_name'] . ' ' . $data['last_name'],
             ]);
             $stripe_cus_id = $customer['id'];
-
-            // Create user card on stripe
-            $card = $stripe->cards()->create($stripe_cus_id, $data['stripe_token']);
-
+            
             // Create user on database
-            $token = Str::random(60);
             $user = new User;
             $user->stripe_cus_id = $stripe_cus_id;
-            $user->email_verify_token = $token;
+            $user->email_verify_token = Str::random(60);
             $user->fill($data);
             $user->save();
             $userId = $user->id;
@@ -52,11 +48,35 @@ class CharityTickerRepository
             // Create user charity ticker
             $charityTicker = new CharityTicker;
             $charityTicker->user_id = $userId;
-            if (!$request->has('hasSubscribed')) {
+            if (config('timetogive.mode')=='countup' && !$request->has('is_subscribed')) { // for 'deposit' will calculate correct timer_expiry_timestamp upon email verification
                 $charityTicker->timer_expiry_timestamp = Carbon::createFromFormat('Y/m/d H:i', $data['timer_expiry_timestamp'])->format('Y-m-d H:i:s'); // user entered datetime - converted to timestamp
+            } elseif (config('timetogive.mode')=='deposit') {
+                $charityTicker->total_donation_amount = (double)$data['total_donation_amount']; // TODO currency data type...
             }
             $charityTicker->fill($data);
             $charityTicker->save();
+
+            if (config('timetogive.mode') == 'countup') {
+                // Create user card on stripe
+                $card = $stripe->cards()->create($stripe_cus_id, $data['stripe_token']);
+            } else if (config('timetogive.mode') == 'deposit') {
+                $org = CharityOrganization::find($data['charity_organization_id']);
+                $charge = $stripe->charges()->create([
+                    'customer' => $stripe_cus_id,
+                    'currency' => 'USD',
+                    'amount'   => $data['total_donation_amount'],
+                    'capture'  => config('timetogive.capture', false),
+                    'source'   => $data['stripe_token'],
+                    'description' => "TimeToGive charity ticker for {$org->name}",
+                    // 'metadata'  => [
+                    //     'user_id' => ,
+                    //     'to' => $org->name,
+                    //     'id'    => ,
+                    // ]
+                ]);
+                $charityTicker->charge = $charge['id'];
+                $charityTicker->save();
+            }
             DB::commit();
             $details = $this->getCharityInfoById($charityTicker->id);
             VerifyEmailEvent::dispatch($user);
@@ -140,11 +160,18 @@ class CharityTickerRepository
         $password = Illuminate\Support\Collection::times(4, fn() => Illuminate\Support\Str::random(5) )->join('-');
         $user->status = 1;
         $user->email_verify_token = null;
-        $user->email_verified_at = now();
+        $now = now();
+        $user->email_verified_at = $now;
         $user->password = Hash::make($password);
         $user->save();
 
-        $charityDt->timer_start = now();
+        if (config('timetogive.mode')=='deposit') {
+            $charityDt->donation_amount
+            $charityDt->tick_frequency
+            $charityDt->tick_frequency_unit
+            $charityDt->timer_expiry_timestamp = Carbon::createFromFormat('Y/m/d H:i', $data['timer_expiry_timestamp'])->format('Y-m-d H:i:s'); // user entered datetime - converted to timestamp
+        } // for 'countup' we set timer_expiry_timestamp as user submitted by form
+        $charityDt->timer_start = $now;
         $charityDt->save();
 
         UserPasswordEmailEvent::dispatch($user, $password);
@@ -195,7 +222,9 @@ class CharityTickerRepository
                 $charityDt->timer_start = $timer_start;
             }
             $charityDt->timer_completed_at = $time;
-            $charityDt->total_donation_amount = calTotalDonationAmount($timer_start, $time, $charityDt->donation_amount, $charityDt->tick_frequency, $charityDt->tick_frequency_unit);
+            if(config('timetogive.mode')=='countup'){ // for 'deposit' it should be user input from the very start
+                $charityDt->total_donation_amount = calTotalDonationAmount($timer_start, $time, $charityDt->donation_amount, $charityDt->tick_frequency, $charityDt->tick_frequency_unit);
+            }
             $charityDt->save();
             DB::commit();
             return true;
@@ -223,7 +252,7 @@ class CharityTickerRepository
             // If user entered expiry time and its not completed
             $timeText = '';
             if ($charityDt->timer_expiry_timestamp && !$charityDt->timer_completed_at) {
-                $this->stopUserCharity($charity_code);
+                $this->stopUserCharity($charity_code); // TODO server-side check & confirm before stopping
                 // $time = now();
                 // // echo $charityDt->timer_expiry_timestamp;
                 // // echo '--';

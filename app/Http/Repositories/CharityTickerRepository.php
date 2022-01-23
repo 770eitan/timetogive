@@ -175,10 +175,12 @@ class CharityTickerRepository
         ];
 
         if (config('timetogive.mode')=='deposit') {
-            $numcompletesteps = (int)($charityDt->total_donation_amount / $charityDt->donation_amount);
-            $remaindersteps = $charityDt->total_donation_amount % $charityDt->donation_amount;
+            $tda = (int)($charityDt->total_donation_amount * 100);
+            $da = (int)($charityDt->donation_amount * 100);
+            $numcompletesteps = (int)($tda / $da);
+            $remaindersteps = $tda % $da;
             $secondsbetweensteps = $charityDt->tick_frequency * $unittosec[$charityDt->tick_frequency_unit];
-            $completestepstotalseconds = $numsteps * $secondsbetweensteps;
+            $completestepstotalseconds = $numcompletesteps * $secondsbetweensteps;
             $remainderstepstotalseconds = (int)($remaindersteps * $secondsbetweensteps);
             $charityDt->timer_expiry_timestamp = now()->addSeconds($completestepstotalseconds + $remainderstepstotalseconds);
         } // for 'countup' we set timer_expiry_timestamp as user submitted by form

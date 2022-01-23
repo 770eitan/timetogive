@@ -55,7 +55,6 @@ class CharityTickerRepository
                 $charityTicker->total_donation_amount = (double)$data['total_donation_amount']; // TODO currency data type...
             }
             $charityTicker->fill($data);
-            $charityTicker->save();
 
             // if (config('timetogive.mode') == 'countup') {
             //     // Create user card on stripe
@@ -78,8 +77,8 @@ class CharityTickerRepository
                     // ]
                 ]);
                 $charityTicker->charge = $charge['id'];
-                $charityTicker->save();
             }
+            $charityTicker->save();
             DB::commit();
             $details = $this->getCharityInfoById($charityTicker->id);
             VerifyEmailEvent::dispatch($user);

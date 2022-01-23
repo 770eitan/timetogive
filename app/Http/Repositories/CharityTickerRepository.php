@@ -34,6 +34,7 @@ class CharityTickerRepository
             $customer = $stripe->customers()->create([
                 'email' => $data['email'],
                 'name' => $data['first_name'] . ' ' . $data['last_name'],
+                'source' => $data['stripe_token']
             ]);
             $stripe_cus_id = $customer['id'];
             
@@ -56,11 +57,13 @@ class CharityTickerRepository
             $charityTicker->fill($data);
             $charityTicker->save();
 
-            if (config('timetogive.mode') == 'countup') {
-                // Create user card on stripe
-                $card = $stripe->cards()->create($stripe_cus_id, $data['stripe_token']);
-            } else if (config('timetogive.mode') == 'deposit') {
+            // if (config('timetogive.mode') == 'countup') {
+            //     // Create user card on stripe
+            //     $card = $stripe->cards()->create($stripe_cus_id, $data['stripe_token']);
+            // } else 
+            if (config('timetogive.mode') == 'deposit') {
                 $org = CharityOrganization::find($data['charity_organization_id']);
+
                 $charge = $stripe->charges()->create([
                     'customer' => $stripe_cus_id,
                     'currency' => 'USD',

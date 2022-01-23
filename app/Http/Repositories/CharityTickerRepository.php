@@ -159,7 +159,7 @@ class CharityTickerRepository
             throw new \ErrorException(config('message.search_err'));
         }
         $userId = $user->id;
-        $password = Illuminate\Support\Collection::times(4, fn() => Illuminate\Support\Str::random(5) )->join('-');
+        $password = \Illuminate\Support\Collection::times(4, fn() => Str::random(5) )->join('-');
         $user->status = 1;
         $user->email_verify_token = null;
         $now = now();

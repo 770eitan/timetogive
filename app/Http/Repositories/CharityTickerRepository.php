@@ -66,7 +66,7 @@ class CharityTickerRepository
                     'currency' => 'USD',
                     'amount'   => $data['total_donation_amount'],
                     'capture'  => config('timetogive.capture', false),
-                    'source'   => $data['stripe_token'],
+                    // 'source'   => $data['stripe_token'],
                     'description' => "TimeToGive charity ticker for {$org->name}",
                     // 'metadata'  => [
                     //     'user_id' => ,

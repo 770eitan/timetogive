@@ -178,7 +178,7 @@
                                             <div class="input-group-text">$</div>
                                             <input type="number" value="{{ old('total_donation_amount') }}" name="total_donation_amount" id="total_donation_amount"
                                                 class="form-control @error('total_donation_amount') is-invalid @enderror"
-                                                placeholder="$50" step="0.01" min="0.01" required>
+                                                placeholder="50" step="0.01" min="0.01" required>
                                             @error('total_donation_amount')
                                                 @include('shared.error',['message'=>$message])
                                             @enderror
@@ -190,7 +190,7 @@
                                             <div class="input-group-text">$</div>
                                             <input type="number" value="{{ old('donation_amount') }}" name="donation_amount" id="donation_amount"
                                                 class="form-control @error('donation_amount') is-invalid @enderror"
-                                                placeholder="How much?" step="0.01" min="0.01" required>
+                                                placeholder="0.10" step="0.01" min="0.01" required>
                                             @error('donation_amount')
                                                 @include('shared.error',['message'=>$message])
                                             @enderror

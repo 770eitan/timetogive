@@ -4,5 +4,5 @@
 
 @section('content')
     @include('home.header')
-    @include('home.payment-deposit')
+    @include('home.payment')
 @endsection

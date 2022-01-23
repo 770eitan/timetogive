@@ -199,7 +199,7 @@
                                     <div class="col-sm-12 col-md-6">
                                         <label class="form-label" for="tick_frequency">Every</label>
                                         <div class="input-group">
-                                            <div class="input-group-text">Every</div>
+                                            {{-- <div class="input-group-text">Every</div> --}}
                                             <input type="number" value="{{ old('tick_frequency') }}" name="tick_frequency" id="tick_frequency"
                                                 class="form-control @error('tick_frequency') is-invalid @enderror"
                                                 placeholder="How often?" step="1" min="1" required>

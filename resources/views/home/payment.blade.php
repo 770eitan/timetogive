@@ -101,68 +101,133 @@
                                 </div>
                                 @break
                             @case('deposit')
-                                <div class="col-12">
-                                    <label class="form-label">Examples</label>
-                                    <ul>
-                                        <li>Give $0.05 every 30 minutes up to total of $10</li>
-                                        <li>Give $0.01 every 3 seconds up to total of $200</li>
-                                    </ul>
-                                </div>
-                                <div class="col-sm-12 col-md-3">
-                                    <label for="donation_amount" class="form-label">Give</label>
-                                    <div class="input-group">
-                                        <div class="input-group-text">$</div>
-                                        <input type="number" value="{{ old('donation_amount') }}" name="donation_amount" id="donation_amount"
-                                            class="form-control @error('donation_amount') is-invalid @enderror"
-                                            placeholder="How much?" step="0.01" min="0.01" required>
-                                        @error('donation_amount')
+                                @if(false)
+                                    <div class="col-12">
+                                        <label class="form-label">Examples</label>
+                                        <ul>
+                                            <li>Give $0.05 every 30 minutes up to total of $10</li>
+                                            <li>Give $0.01 every 3 seconds up to total of $200</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-sm-12 col-md-3">
+                                        <label for="donation_amount" class="form-label">Give</label>
+                                        <div class="input-group">
+                                            <div class="input-group-text">$</div>
+                                            <input type="number" value="{{ old('donation_amount') }}" name="donation_amount" id="donation_amount"
+                                                class="form-control @error('donation_amount') is-invalid @enderror"
+                                                placeholder="How much?" step="0.01" min="0.01" required>
+                                            @error('donation_amount')
+                                                @include('shared.error',['message'=>$message])
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-3">
+                                        <label class="form-label" for="tick_frequency">Every</label>
+                                        <input type="number" value="{{ old('tick_frequency') }}" name="tick_frequency" id="tick_frequency"
+                                            class="form-control @error('tick_frequency') is-invalid @enderror"
+                                            placeholder="How often?" step="1" min="1" required>
+                                        @error('tick_frequency')
                                             @include('shared.error',['message'=>$message])
                                         @enderror
                                     </div>
-                                </div>
-                                <div class="col-sm-12 col-md-3">
-                                    <label class="form-label" for="tick_frequency">Every</label>
-                                    <input type="number" value="{{ old('tick_frequency') }}" name="tick_frequency" id="tick_frequency"
-                                        class="form-control @error('tick_frequency') is-invalid @enderror"
-                                        placeholder="How often?" step="1" min="1" required>
-                                    @error('tick_frequency')
-                                        @include('shared.error',['message'=>$message])
-                                    @enderror
-                                </div>
-                                <div class="col-sm-12 col-md-3">
-                                    <label class="form-label" for="tick_frequency_unit">.. how often?</label>
-                                    <select class="form-select @error('tick_frequency_unit') is-invalid @enderror"
-                                        name="tick_frequency_unit" id="tick_frequency_unit" required>
-                                        <option>Choose…</option>
-                                        <option value="sec" {{ old('tick_frequency_unit') == 'sec' ? 'selected' : '' }}>
-                                            Seconds
-                                        </option>
-                                        <option value="mins" {{ old('tick_frequency_unit') == 'mins' ? 'selected' : '' }}>
-                                            Minutes
-                                        </option>
-                                        <option value="hours" {{ old('tick_frequency_unit') == 'hours' ? 'selected' : '' }}>
-                                            Hours
-                                        </option>
-                                        <option value="days" {{ old('tick_frequency_unit') == 'days' ? 'selected' : '' }}>
-                                            Days
-                                        </option>
-                                    </select>
-                                    @error('tick_frequency')
-                                        @include('shared.error',['message'=>$message])
-                                    @enderror
-                                </div>
-                                <div class="col-sm-12 col-md-3">
-                                    <label for="total_donation_amount" class="form-label">Up To Total</label>
-                                    <div class="input-group">
-                                        <div class="input-group-text">$</div>
-                                        <input type="number" value="{{ old('total_donation_amount') }}" name="total_donation_amount" id="total_donation_amount"
-                                            class="form-control @error('total_donation_amount') is-invalid @enderror"
-                                            placeholder="$50" step="0.01" min="0.01" required>
-                                        @error('total_donation_amount')
+                                    <div class="col-sm-12 col-md-3">
+                                        <label class="form-label" for="tick_frequency_unit">.. how often?</label>
+                                        <select class="form-select @error('tick_frequency_unit') is-invalid @enderror"
+                                            name="tick_frequency_unit" id="tick_frequency_unit" required>
+                                            <option>Choose…</option>
+                                            <option value="sec" {{ old('tick_frequency_unit') == 'sec' ? 'selected' : '' }}>
+                                                Seconds
+                                            </option>
+                                            <option value="mins" {{ old('tick_frequency_unit') == 'mins' ? 'selected' : '' }}>
+                                                Minutes
+                                            </option>
+                                            <option value="hours" {{ old('tick_frequency_unit') == 'hours' ? 'selected' : '' }}>
+                                                Hours
+                                            </option>
+                                            <option value="days" {{ old('tick_frequency_unit') == 'days' ? 'selected' : '' }}>
+                                                Days
+                                            </option>
+                                        </select>
+                                        @error('tick_frequency')
                                             @include('shared.error',['message'=>$message])
                                         @enderror
                                     </div>
-                                </div>
+                                    <div class="col-sm-12 col-md-3">
+                                        <label for="total_donation_amount" class="form-label">Up To Total</label>
+                                        <div class="input-group">
+                                            <div class="input-group-text">$</div>
+                                            <input type="number" value="{{ old('total_donation_amount') }}" name="total_donation_amount" id="total_donation_amount"
+                                                class="form-control @error('total_donation_amount') is-invalid @enderror"
+                                                placeholder="$50" step="0.01" min="0.01" required>
+                                            @error('total_donation_amount')
+                                                @include('shared.error',['message'=>$message])
+                                            @enderror
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="col-12">
+                                        <label class="form-label">Examples</label>
+                                        <ul>
+                                            <li>I want to give $10 divided into $0.05 every 30 minutes</li>
+                                            <li>I want to give $200 divided into $0.01 every 3 seconds</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-sm-12 col-md-3">
+                                        <label for="total_donation_amount" class="form-label">I want to give</label>
+                                        <div class="input-group">
+                                            <div class="input-group-text">$</div>
+                                            <input type="number" value="{{ old('total_donation_amount') }}" name="total_donation_amount" id="total_donation_amount"
+                                                class="form-control @error('total_donation_amount') is-invalid @enderror"
+                                                placeholder="$50" step="0.01" min="0.01" required>
+                                            @error('total_donation_amount')
+                                                @include('shared.error',['message'=>$message])
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-3">
+                                        <label for="donation_amount" class="form-label">Divided into</label>
+                                        <div class="input-group">
+                                            <div class="input-group-text">$</div>
+                                            <input type="number" value="{{ old('donation_amount') }}" name="donation_amount" id="donation_amount"
+                                                class="form-control @error('donation_amount') is-invalid @enderror"
+                                                placeholder="How much?" step="0.01" min="0.01" required>
+                                            @error('donation_amount')
+                                                @include('shared.error',['message'=>$message])
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <label class="form-label" for="tick_frequency">Every</label>
+                                        <div class="input-group">
+                                            <div class="input-group-text">Every</div>
+                                            <input type="number" value="{{ old('tick_frequency') }}" name="tick_frequency" id="tick_frequency"
+                                                class="form-control @error('tick_frequency') is-invalid @enderror"
+                                                placeholder="How often?" step="1" min="1" required>
+                                            <select class="form-select @error('tick_frequency_unit') is-invalid @enderror"
+                                                name="tick_frequency_unit" required>
+                                                <option selected="">Choose…</option>
+                                                <option value="sec" {{ old('tick_frequency_unit') == 'sec' ? 'selected' : '' }}>
+                                                    Seconds
+                                                </option>
+                                                <option value="mins" {{ old('tick_frequency_unit') == 'mins' ? 'selected' : '' }}>
+                                                    Minutes
+                                                </option>
+                                                <option value="hours"
+                                                    {{ old('tick_frequency_unit') == 'hours' ? 'selected' : '' }}>Hours
+                                                </option>
+                                                <option value="days"
+                                                    {{ old('tick_frequency_unit') == 'days' ? 'selected' : '' }}>Days
+                                                </option>
+                                            </select>
+                                            @error('tick_frequency')
+                                                @include('shared.error',['message'=>$message])
+                                            @enderror
+                                            @error('tick_frequency_unit')
+                                                @include('shared.error',['message'=>$message])
+                                            @enderror
+                                        </div>
+                                    </div>
+                                @endif
                                 @break
                         @endswitch
                         <div class="{{ config('timetogive.mode') == 'deposit' ? 'col-12' : 'col-sm-12 col-md-6' }}">

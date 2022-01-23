@@ -38,6 +38,8 @@ class RevampCharityTickers extends Migration
 
                 $table->tinyInteger('is_subscribed')->comment('Keep the payment going until stopped')->nullable(false)->default(1)->change();
                 $table->renameColumn('is_subscribed', 'hasSubscribed');
+
+                $table->dropColumn('charge');
             });
         }
     }

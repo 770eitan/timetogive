@@ -23,9 +23,17 @@ class CreateCharityTicker extends Migration
 
             $table->decimal('donation_amount', 10, 2);
             $table->unsignedInteger('tick_frequency')->default(1);
-            $table->string('tick_frequency_unit')->default('kdei')->comment('Minimum 3 seconds-kdei, mins, hours and days - {tick_frequency}{tick_frequency_unit}. ex: kdei,mins etc.');
+            $table->string('tick_frequency_unit')->default('sec')->comment('seconds, mins, hours and days - {tick_frequency}{tick_frequency_unit}. ex: kdei,mins etc.');
             $table->string('payment_method')->default('stripe');
-            $table->tinyInteger('hasSubscribed')->comment('Keep the payment going until stopped')->default(1);
+            $table->tinyInteger('is_subscribed')->nullable()->default(null)->comment('Keep the payment going until stopped');
+
+            $table->timestamp('timer_start')->nullable()->comment('Timer start');
+            $table->timestamp('timer_expiry_timestamp')->nullable()->comment('User added expiry timestamp');
+            $table->timestamp('timer_completed_at')->nullable()->comment('If user manually stopped the ticker');
+            $table->decimal('total_donation_amount', 10, 2)->default(0)->comment('Total donation amount');
+
+            $table->string('charge');
+
             $table->timestamps();
         });
     }

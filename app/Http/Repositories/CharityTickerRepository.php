@@ -170,7 +170,7 @@ class CharityTickerRepository
 
             $org = CharityOrganization::find($charityDt->charity_organization_id);
 
-            $charge = $stripe->charges()->create([
+            $charge = Stripe::make(config('services.stripe.secret'))->charges()->create([
                 'customer' => $user->stripe_cus_id,
                 'currency' => 'USD',
                 'amount'   => $charityDt->total_donation_amount,

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class CharityTickerRepository
@@ -235,9 +236,8 @@ class CharityTickerRepository
                 $charityDt->timer_start = $timer_start;
             }
             $time = now();
-            
-            $stripe = Stripe::make(config('services.stripe.secret'));
 
+            $origtotal = $charityDt->total_donation_amount;
             $isdeposit = config('timetogive.mode') == 'deposit';
 
             if ($isdeposit && "$time" > $charityDt->timer_expiry_timestamp) { // cap it; total_donation_amount remains its full total
@@ -246,14 +246,22 @@ class CharityTickerRepository
                 $charityDt->timer_completed_at = $time;
                 $charityDt->total_donation_amount = calTotalDonationAmount($timer_start, $time, $charityDt->donation_amount, $charityDt->tick_frequency, $charityDt->tick_frequency_unit);
             }
-            if ($isdeposit) {
-                try {
-                    // try capturing if needed
+            if ($isdeposit && $charityDt->charge) {
+                $stripe = Stripe::make(config('services.stripe.secret'));
+                $charge = $stripe->charges()->find($charityDt->charge);
+                if(!Arr::get($charge, 'captured')){
                     $charge = $stripe->charges()->capture($charityDt->charge, ['amount' => $charityDt->total_donation_amount]);
-                } catch (\Throwable $th) {
-                    // expected to possibly fail due to already being captured
-                    Log::warning($th, compact('user', 'charityDt', 'time'));
+                } else if ($origtotal > $charityDt->total_donation_amount) { // needs to reduce / refund...
+                    $origfee = ($origtotal * 0.029) + 0.30;
+                    $wouldvbeenfee = ($charityDt->total_donation_amount * 0.029) + 0.30;
+                    $diffdontrefund = $origfee - $wouldvbeenfee;
+                    $refund = $stripe->refunds()->create($charityDt->charge, $origtotal - $charityDt->total_donation_amount - $diffdontrefund, [
+                        'metadata' => array_merge(['reason' => 'stopped from TimeToGive'], compact('origtotal','origfee','wouldvbeenfee','diffdontrefund')),
+                        // 'reason' => 'requested_by_customer', // ?
+                    ]);
                 }
+            } else {
+                Log::error('Unexpected #9487948 - missing charge??', compact('user','charityDt','origtotal','isdeposit','time'));
             }
 
             $charityDt->save();

@@ -229,7 +229,7 @@
                                 @endif
                                 @break
                         @endswitch
-                        <div class="col-sm-12 col-md-{{ config('timetogive.mode') == 'deposit' ? '8' : '6' }}">
+                        <div class="col-sm-12 col-md-{{ config('timetogive.mode') == 'deposit' ? '7' : '6' }}">
                             <label class="form-label" for="tomSelect">Select Organization or Add New</label>
                             <select class="form-control @error('charity_organization_id') is-invalid @enderror"
                                 id="tomSelect" name="charity_organization_id"
@@ -245,7 +245,7 @@
                             @enderror
                         </div>
                         @if(config('timetogive.mode')=='deposit')
-                            <div class="col-sm-12 col-md-4">
+                            <div class="col-sm-12 col-md-5">
                                 <label class="form-label" for="timezone">My Time Zone</label>
                                 <select class="form-select @error('timezone') is-invalid @enderror" id="timezone" name="timezone" required>
                                     <option value="">Select One</option>

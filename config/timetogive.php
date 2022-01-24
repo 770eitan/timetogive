@@ -8,7 +8,7 @@ return [
     'capture' => env('TIMETOGIVE_CAPTURE', false), // false, true
 
     // 'timezones' => array_map(fn($tz) => "$tz (".(new \Carbon\CarbonTimeZone($tz))->toOffsetName().')', timezone_identifiers_list())
-    'timezonea' => (function(){
+    'timezones' => (function(){
         $tzcache = [];
         $p1 = [];
         $result = [];

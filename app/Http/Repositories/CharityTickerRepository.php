@@ -12,6 +12,7 @@ use Cartalyst\Stripe\Stripe;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -228,16 +229,33 @@ class CharityTickerRepository
             if (!$charityDt) {
                 throw new \ErrorException(config('message.search_err'));
             }
-            $time = now();
             $timer_start = $charityDt->timer_start;
             if (!$timer_start) {
                 $timer_start = $user->email_verified_at;
                 $charityDt->timer_start = $timer_start;
             }
-            $charityDt->timer_completed_at = $time;
-            if(config('timetogive.mode')=='countup'){ // for 'deposit' it should be user input from the very start
+            $time = now();
+            
+            $stripe = Stripe::make(config('services.stripe.secret'));
+
+            $isdeposit = config('timetogive.mode') == 'deposit';
+
+            if ($isdeposit && "$time" > $charityDt->timer_expiry_timestamp) { // cap it; total_donation_amount remains its full total
+                $charityDt->timer_completed_at = $charityDt->timer_expiry_timestamp;
+            } else { // in all other cases - timer was ended early; total needs to be reduced
+                $charityDt->timer_completed_at = $time;
                 $charityDt->total_donation_amount = calTotalDonationAmount($timer_start, $time, $charityDt->donation_amount, $charityDt->tick_frequency, $charityDt->tick_frequency_unit);
             }
+            if ($isdeposit) {
+                try {
+                    // try capturing if needed
+                    $charge = $stripe->charges()->capture($charityDt->charge, ['amount' => $charityDt->total_donation_amount]);
+                } catch (\Throwable $th) {
+                    // expected to possibly fail due to already being captured
+                    Log::warning($th, compact('user', 'charityDt', 'time'));
+                }
+            }
+
             $charityDt->save();
             DB::commit();
             return true;

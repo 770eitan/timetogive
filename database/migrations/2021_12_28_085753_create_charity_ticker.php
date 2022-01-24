@@ -32,7 +32,7 @@ class CreateCharityTicker extends Migration
             $table->timestamp('timer_completed_at')->nullable()->comment('If user manually stopped the ticker');
             $table->decimal('total_donation_amount', 10, 2)->default(0)->comment('Total donation amount');
 
-            $table->string('charge');
+            $table->string('charge')->nullable();
 
             $table->timestamps();
         });

@@ -247,7 +247,7 @@
                         @if(config('timetogive.mode')=='deposit')
                             <div class="col-sm-12 col-md-4">
                                 <label class="form-label" for="timezone">My Time Zone</label>
-                                <select class="form-control @error('timezone') is-invalid @enderror" id="timezone" name="timezone" required>
+                                <select class="form-select @error('timezone') is-invalid @enderror" id="timezone" name="timezone" required>
                                     <option value="">Select One</option>
                                     @foreach (config('timetogive.timezones') as $tzlabel => $tzval)
                                         <option value="{{ $tzval }}">{{ $tzlabel }}</option>
@@ -500,7 +500,7 @@
     </script>
     <script type="text/javascript">
         window.addEventListener("load", function() {
-            document.querySelector('timezone').value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            document.getElementById('timezone').value = Intl.DateTimeFormat().resolvedOptions().timeZone;
         });
     </script>
 @endpush

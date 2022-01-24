@@ -178,7 +178,7 @@ class CharityTickerRepository
                 // 'source'   => $data['stripe_token'],
                 'description' => "TimeToGive charity ticker for {$org->name}",
                 'metadata'  => [
-                    'user_id' => $user->id,
+                    'user_id' => $userId,
                     'to' => $org->name,
                     'id' => $charityDt->id,
                 ]

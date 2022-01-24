@@ -6,6 +6,7 @@ use App\Http\Repositories\CharityTickerRepository;
 use App\Http\Requests\CreateCharitySearchRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Session;
 
 class HomeController extends Controller
@@ -66,6 +67,7 @@ class HomeController extends Controller
             $user = $this->charityTickerRepo->verifyUserFromEmailToken($token);
             return redirect()->route('charity', ['charity_code' => $user->charity_ticker->charity_code]);
         } catch (\Exception $exception) {
+            Log::error($exception, $exception);
             return redirect()->route('home')->withError(config('message.invalid_ch'));
         }
     }

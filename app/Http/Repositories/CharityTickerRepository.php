@@ -62,24 +62,6 @@ class CharityTickerRepository
             //     // Create user card on stripe
             //     $card = $stripe->cards()->create($stripe_cus_id, $data['stripe_token']);
             // } else 
-            if (config('timetogive.mode') == 'deposit') {
-                $org = CharityOrganization::find($data['charity_organization_id']);
-
-                $charge = $stripe->charges()->create([
-                    'customer' => $stripe_cus_id,
-                    'currency' => 'USD',
-                    'amount'   => $data['total_donation_amount'],
-                    'capture'  => config('timetogive.capture', false),
-                    // 'source'   => $data['stripe_token'],
-                    'description' => "TimeToGive charity ticker for {$org->name}",
-                    // 'metadata'  => [
-                    //     'user_id' => ,
-                    //     'to' => $org->name,
-                    //     'id'    => ,
-                    // ]
-                ]);
-                $charityTicker->charge = $charge['id'];
-            }
             $charityTicker->save();
             DB::commit();
             $details = $this->getCharityInfoById($charityTicker->id);
@@ -185,6 +167,23 @@ class CharityTickerRepository
             $completestepstotalseconds = $numcompletesteps * $secondsbetweensteps;
             $remainderstepstotalseconds = (int)($remaindersteps * $secondsbetweensteps);
             $charityDt->timer_expiry_timestamp = now()->addSeconds($completestepstotalseconds + $remainderstepstotalseconds);
+
+            $org = CharityOrganization::find($charityDt->charity_organization_id);
+
+            $charge = $stripe->charges()->create([
+                'customer' => $user->stripe_cus_id,
+                'currency' => 'USD',
+                'amount'   => $charityDt->total_donation_amount,
+                'capture'  => config('timetogive.capture', false),
+                // 'source'   => $data['stripe_token'],
+                'description' => "TimeToGive charity ticker for {$org->name}",
+                'metadata'  => [
+                    'user_id' => $user->id,
+                    'to' => $org->name,
+                    'id' => $charityDt->id,
+                ]
+            ]);
+            $charityDt->charge = $charge['id'];
         } // for 'countup' we set timer_expiry_timestamp as user submitted by form
         $charityDt->timer_start = $now;
         $charityDt->save();

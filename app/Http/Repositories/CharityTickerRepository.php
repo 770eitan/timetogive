@@ -177,7 +177,7 @@ class CharityTickerRepository
                 'capture'  => config('timetogive.capture', false),
                 // 'source'   => $data['stripe_token'],
                 'description' => "TimeToGive charity ticker for {$org->name}",
-                'metadata'  => [
+                'metadata' => [
                     'user_id' => $userId,
                     'to' => $org->name,
                     'id' => $charityDt->id,
@@ -250,6 +250,8 @@ class CharityTickerRepository
                 $charge = $stripe->charges()->find($charityDt->charge);
                 if(!Arr::get($charge, 'captured')){
                     $charge = $stripe->charges()->capture($charityDt->charge, ['amount' => $charityDt->total_donation_amount]);
+                    /////////////////////////////////////////////////////////////////////////////////////
+                    //  Cartalyst\Stripe\Exception\MissingParameterException
                 } else if ($origtotal > $charityDt->total_donation_amount) { // needs to reduce / refund...
                     $origfee = ($origtotal * 0.029) + 0.30;
                     $wouldvbeenfee = ($charityDt->total_donation_amount * 0.029) + 0.30;

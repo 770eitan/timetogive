@@ -23,8 +23,7 @@
                 <h2 class="mb-3">Billing Info</h2>
                 <hr class="mb-4 ">
                 --}}
-                <form action="{{ route('createTick') }}" method="POST" autocomplete="off" id="paymentForm"
-                    style="position: relative">
+                <form action="{{ route('createTick') }}" method="POST" autocomplete="off" id="paymentForm" style="position: relative">
                     @csrf
                     <div class="row g-3" style="position: relative">
                         <div class="col-sm-12 col-md-6">
@@ -230,7 +229,7 @@
                                 @endif
                                 @break
                         @endswitch
-                        <div class="{{ config('timetogive.mode') == 'deposit' ? 'col-12' : 'col-sm-12 col-md-6' }}">
+                        <div class="col-sm-12 col-md-{{ config('timetogive.mode') == 'deposit' ? '8' : '6' }}">
                             <label class="form-label" for="tomSelect">Select Organization or Add New</label>
                             <select class="form-control @error('charity_organization_id') is-invalid @enderror"
                                 id="tomSelect" name="charity_organization_id"
@@ -245,6 +244,20 @@
                                 @include('shared.error',['message'=>$message])
                             @enderror
                         </div>
+                        @if(config('timetogive.mode')=='deposit')
+                            <div class="col-sm-12 col-md-4">
+                                <label class="form-label" for="timezone">My Time Zone</label>
+                                <select class="form-control @error('timezone') is-invalid @enderror" id="timezone" name="timezone" required>
+                                    <option value="">Select One</option>
+                                    @foreach (config('timetogive.timezones') as $tzlabel => $tzval)
+                                        <option value="{{ $tzval }}">{{ $tzlabel }}</option>
+                                    @endforeach
+                                </select>
+                                @error('timezone')
+                                    @include('shared.error',['message'=>$message])
+                                @enderror
+                            </div>
+                        @endif
                         @if(config('timetogive.mode')=='countup')
                             <div class="col-sm-12 col-md-6">
                                 <div class="form-check d-none d-sm-none d-md-none d-lg-block">
@@ -337,7 +350,7 @@
 @push('scripts')
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     @if(config('timetogive.mode')=='countup')
-    <script src="{{ asset('datepicker/jquery.datetimepicker.full.min.js') }}"></script>
+        <script src="{{ asset('datepicker/jquery.datetimepicker.full.min.js') }}"></script>
     @endif
 
     <script type="text/javascript">
@@ -405,8 +418,8 @@
             @if (old('charity_organization_id'))
                 tomSelect.setValue({{ old('charity_organization_id') }},true);
                 setTimeout(() => {
-                tomSelect.close();
-                tomSelect.blur();
+                    tomSelect.close();
+                    tomSelect.blur();
                 }, 10);
             @endif
         });
@@ -483,6 +496,11 @@
                 // Submit the form
                 form.submit();
             }
+        });
+    </script>
+    <script type="text/javascript">
+        window.addEventListener("load", function() {
+            document.querySelector('timezone').value = Intl.DateTimeFormat().resolvedOptions().timeZone;
         });
     </script>
 @endpush

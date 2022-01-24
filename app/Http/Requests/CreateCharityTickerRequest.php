@@ -38,6 +38,7 @@ class CreateCharityTickerRequest extends FormRequest
             $r['timer_expiry_timestamp'] = 'required_without:is_subscribed|date_format:Y/m/d H:i';
         } elseif (config('timetogive.mode')=='deposit') {
             $r['total_donation_amount'] = ['required','numeric','min:0.01', 'gte:donation_amount'];
+            $r['timezone'] = ['required', Rule::in(timezone_identifiers_list())];
         }
         return $r;
     }
@@ -56,7 +57,7 @@ class CreateCharityTickerRequest extends FormRequest
             'donation_amount.min' => 'Minimum donation amount is 0.01',
             'donation_amount.lte' => 'Subdivided amount cannot be more than total donation amount',
             'tick_frequency.integer' => 'Please enter a valid numeric value',
-            'stripe_token.required' => 'Please enter a valid payment.',
+            'stripe_token.required' => 'Please enter valid payment details',
         ];
         if(config('timetogive.mode')=='countup'){
             $r['timer_expiry_timestamp.required_without'] = 'Please choose expiry date.';

@@ -80,36 +80,36 @@ if (!function_exists('formatDonationAmountText')) {
     }
 }
 
-if (!function_exists('getRemainingTime')) {
-    function getRemainingTime($timer_expiry, $rt = false)
-    {
-        $startDate = Carbon::parse($timer_expiry);
-        $endDate = Carbon::parse(now());
-        if ($startDate->gt($endDate)) {
-            $data = [
-                's' => $startDate->diffInSeconds($endDate),
-                'h' => $startDate->diffInHours($endDate),
-                'm' => $startDate->diffInMinutes($endDate),
-                'd' => $startDate->diffInDays($endDate),
-            ];
-            if ($rt == true) {
-                return $data['s'];
-            }
-            if ($data['d'] > 0) {
-                return "{$data['d']} ".Str::plural('Day', $data['d']);
-            }
-            if ($data['h'] > 0) {
-                return "{$data['h']} ".Str::plural('Hour', $data['h']);
-            }
-            if ($data['m'] > 0) {
-                return "{$data['m']} ".Str::plural('Minute', $data['m']);
-            }
-            if ($data['s'] > 0) {
-                return "{$data['s']} ".Str::plural('Second', $data['s']);
-            }
-            return "N/A";
-        } else {
-            return 0;
-        }
-    }
-}
+// if (!function_exists('getRemainingTime')) {
+//     function getRemainingTime($timer_expiry, $rt = false)
+//     {
+//         $startDate = Carbon::parse($timer_expiry);
+//         $endDate = Carbon::parse(now());
+//         if ($startDate->gt($endDate)) {
+//             $data = [
+//                 's' => $startDate->diffInSeconds($endDate),
+//                 'h' => $startDate->diffInHours($endDate),
+//                 'm' => $startDate->diffInMinutes($endDate),
+//                 'd' => $startDate->diffInDays($endDate),
+//             ];
+//             if ($rt == true) {
+//                 return $data['s'];
+//             }
+//             if ($data['d'] > 0) {
+//                 return "{$data['d']} ".Str::plural('Day', $data['d']);
+//             }
+//             if ($data['h'] > 0) {
+//                 return "{$data['h']} ".Str::plural('Hour', $data['h']);
+//             }
+//             if ($data['m'] > 0) {
+//                 return "{$data['m']} ".Str::plural('Minute', $data['m']);
+//             }
+//             if ($data['s'] > 0) {
+//                 return "{$data['s']} ".Str::plural('Second', $data['s']);
+//             }
+//             return "N/A";
+//         } else {
+//             return 0;
+//         }
+//     }
+// }

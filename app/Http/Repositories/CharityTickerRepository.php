@@ -148,6 +148,7 @@ class CharityTickerRepository
         $user->email_verify_token = null;
         $now = now();
         $user->email_verified_at = $now;
+        Log::debug(__FUNCTION__.':'.__LINE__,['now' => $now, 'now_ts' => $now->timestamp, 'ny' => now('America/New_York'),'ny_ts' => now('America/New_York')->timestamp, 'email_verified_at' => $user->email_verified_at ]);
         $user->password = Hash::make($password);
         $user->save();
 
@@ -158,7 +159,9 @@ class CharityTickerRepository
             'days' => 60 * 60 * 24,
         ];
 
-        if (config('timetogive.mode')=='deposit') {
+        $isdeposit = config('timetogive.mode')=='deposit';
+
+        if ($isdeposit) {
             $tda = (int)($charityDt->total_donation_amount * 100);
             $da = (int)($charityDt->donation_amount * 100);
             $numcompletesteps = (int)($tda / $da);
@@ -166,7 +169,8 @@ class CharityTickerRepository
             $secondsbetweensteps = $charityDt->tick_frequency * $unittosec[$charityDt->tick_frequency_unit];
             $completestepstotalseconds = $numcompletesteps * $secondsbetweensteps;
             $remainderstepstotalseconds = (int)($remaindersteps * $secondsbetweensteps);
-            $charityDt->timer_expiry_timestamp = now()->addSeconds($completestepstotalseconds + $remainderstepstotalseconds);
+            $charityDt->timer_expiry_timestamp = now($user->timezone)->addSeconds($completestepstotalseconds + $remainderstepstotalseconds);
+            Log::debug(__FUNCTION__.':'.__LINE__, ['now' => now(), 'now_ts' => now()->timestamp, 'usr' => now($user->timezone),'usr_ts' => now($user->timezone)->timestamp, 'timer_expiry_timestamp' => $charityDt->timer_expiry_timestamp ]);
 
             $org = CharityOrganization::find($charityDt->charity_organization_id);
 
@@ -185,7 +189,8 @@ class CharityTickerRepository
             ]);
             $charityDt->charge = $charge['id'];
         } // for 'countup' we set timer_expiry_timestamp as user submitted by form
-        $charityDt->timer_start = $now;
+        $charityDt->timer_start = $isdeposit ? now($user->timezone) : $now;
+        Log::debug(__FUNCTION__.':'.__LINE__, ['now' => now(), 'now_ts' => now()->timestamp, 'usr' => now($user->timezone),'usr_ts' => now($user->timezone)->timestamp, 'timer_start' => $charityDt->timer_start ]);
         $charityDt->save();
 
         UserPasswordEmailEvent::dispatch($user, $password);
@@ -229,15 +234,29 @@ class CharityTickerRepository
             if (!$charityDt) {
                 throw new \ErrorException(config('message.search_err'));
             }
+
+            $isdeposit = config('timetogive.mode') == 'deposit';
+
             $timer_start = $charityDt->timer_start;
             if (!$timer_start) {
-                $timer_start = $user->email_verified_at;
+                $timer_start = $isdeposit ? new \Carbon\Carbon($user->email_verified_at, $charityDt->timezone)->format('Y-m-d H:i:s') : $user->email_verified_at;
+                Log::debug(__FUNCTION__.':'.__LINE__, [
+                    'new Carbon' => new \Carbon\Carbon($user->email_verified_at),
+                    'new Carbon_ts' => (new \Carbon\Carbon($user->email_verified_at))->timestamp,
+                    'new Carbon tz' => new \Carbon\Carbon($user->email_verified_at, $charityDt->timezone),
+                    'new Carbon tz_ts' => new \Carbon\Carbon($user->email_verified_at, $charityDt->timezone)->timestamp,
+                    'email_verified_at' => $user->email_verified_at,
+                    'timer_start' => $timer_start,
+                    'charityDt->timer_start' => $charityDt->timer_start
+                ]);
                 $charityDt->timer_start = $timer_start;
             }
-            $time = now();
+
+            $time = now($isdeposit ? $user->timezone : null);
+            Log::debug(__FUNCTION__.':'.__LINE__, ['now' => now(), 'now_ts' => now()->timestamp,
+                'now_tz' => now($user->timezone),'now_tz_ts' => now($user->timezone)->timestamp, 'time' => $time ]);
 
             $origtotal = $charityDt->total_donation_amount;
-            $isdeposit = config('timetogive.mode') == 'deposit';
 
             if ($isdeposit && "$time" > $charityDt->timer_expiry_timestamp) { // cap it; total_donation_amount remains its full total
                 $charityDt->timer_completed_at = $charityDt->timer_expiry_timestamp;

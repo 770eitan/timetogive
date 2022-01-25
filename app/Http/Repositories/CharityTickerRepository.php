@@ -239,12 +239,12 @@ class CharityTickerRepository
 
             $timer_start = $charityDt->timer_start;
             if (!$timer_start) {
-                $timer_start = $isdeposit ? new \Carbon\Carbon($user->email_verified_at, $charityDt->timezone)->format('Y-m-d H:i:s') : $user->email_verified_at;
+                $timer_start = $isdeposit ? (new \Carbon\Carbon($user->email_verified_at, $charityDt->timezone))->format('Y-m-d H:i:s') : $user->email_verified_at;
                 Log::debug(__FUNCTION__.':'.__LINE__, [
                     'new Carbon' => new \Carbon\Carbon($user->email_verified_at),
                     'new Carbon_ts' => (new \Carbon\Carbon($user->email_verified_at))->timestamp,
                     'new Carbon tz' => new \Carbon\Carbon($user->email_verified_at, $charityDt->timezone),
-                    'new Carbon tz_ts' => new \Carbon\Carbon($user->email_verified_at, $charityDt->timezone)->timestamp,
+                    'new Carbon tz_ts' => (new \Carbon\Carbon($user->email_verified_at, $charityDt->timezone))->timestamp,
                     'email_verified_at' => $user->email_verified_at,
                     'timer_start' => $timer_start,
                     'charityDt->timer_start' => $charityDt->timer_start

@@ -22,6 +22,7 @@ class CharityTicker extends Model
         'tick_frequency_unit',
         'total_donation_amount',
         'is_subscribed',
+        'timezone',
     ];
 
     /**

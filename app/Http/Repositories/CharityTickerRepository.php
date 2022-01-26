@@ -264,7 +264,7 @@ class CharityTickerRepository
                 $stripe = Stripe::make(config('services.stripe.secret'));
                 $charge = $stripe->charges()->find($charityDt->charge);
                 if(!Arr::get($charge, 'captured')){
-                    $charge = $stripe->charges()->capture($charityDt->charge, ['amount' => $charityDt->total_donation_amount]);
+                    $charge = $stripe->charges()->capture($charityDt->charge, $charityDt->total_donation_amount, ['amount' => $charityDt->total_donation_amount]);
                     /////////////////////////////////////////////////////////////////////////////////////
                     //  Cartalyst\Stripe\Exception\MissingParameterException
                 } else if ($origtotal > $charityDt->total_donation_amount) { // needs to reduce / refund...

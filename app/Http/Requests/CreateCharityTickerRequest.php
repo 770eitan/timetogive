@@ -38,7 +38,6 @@ class CreateCharityTickerRequest extends FormRequest
             $r['timer_expiry_timestamp'] = 'required_without:is_subscribed|date_format:Y/m/d H:i';
         } elseif (config('timetogive.mode')=='deposit') {
             $r['total_donation_amount'] = ['required','numeric','min:0.01', 'gte:donation_amount'];
-            $r['timezone'] = ['required', Rule::in(timezone_identifiers_list())];
         }
         return $r;
     }

@@ -229,7 +229,7 @@
                                 @endif
                                 @break
                         @endswitch
-                        <div class="col-sm-12 col-md-{{ config('timetogive.mode') == 'deposit' ? '7' : '6' }}">
+                        <div class="{{ config('timetogive.mode') == 'deposit' ? 'col-12' : 'col-sm-12 col-md-6' }}">
                             <label class="form-label" for="tomSelect">Select Organization or Add New</label>
                             <select class="form-control @error('charity_organization_id') is-invalid @enderror"
                                 id="tomSelect" name="charity_organization_id"
@@ -244,20 +244,6 @@
                                 @include('shared.error',['message'=>$message])
                             @enderror
                         </div>
-                        @if(config('timetogive.mode')=='deposit')
-                            <div class="col-sm-12 col-md-5">
-                                <label class="form-label" for="timezone">My Time Zone</label>
-                                <select class="form-select @error('timezone') is-invalid @enderror" id="timezone" name="timezone" required>
-                                    <option value="">Select One</option>
-                                    @foreach (config('timetogive.timezones') as $tzlabel => $tzval)
-                                        <option value="{{ $tzval }}">{{ $tzlabel }}</option>
-                                    @endforeach
-                                </select>
-                                @error('timezone')
-                                    @include('shared.error',['message'=>$message])
-                                @enderror
-                            </div>
-                        @endif
                         @if(config('timetogive.mode')=='countup')
                             <div class="col-sm-12 col-md-6">
                                 <div class="form-check d-none d-sm-none d-md-none d-lg-block">
@@ -496,11 +482,6 @@
                 // Submit the form
                 form.submit();
             }
-        });
-    </script>
-    <script type="text/javascript">
-        window.addEventListener("load", function() {
-            document.getElementById('timezone').value = Intl.DateTimeFormat().resolvedOptions().timeZone;
         });
     </script>
 @endpush

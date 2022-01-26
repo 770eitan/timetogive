@@ -31,7 +31,6 @@ class CreateCharityTicker extends Migration
             $table->timestamp('timer_expiry_timestamp')->nullable()->comment('User added expiry timestamp');
             $table->timestamp('timer_completed_at')->nullable()->comment('If user manually stopped the ticker');
             $table->decimal('total_donation_amount', 10, 2)->default(0)->comment('Total donation amount');
-            $table->string('timezone');
 
             $table->string('charge')->nullable();
 

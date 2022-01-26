@@ -243,12 +243,23 @@ class CharityTickerRepository
             $isdeposit = config('timetogive.mode') == 'deposit';
             $origtotal = $charityDt->total_donation_amount;
 
+            Log::notice('11111111111111111111111 '
+                . print_r(compact('user', 'charityDt', 'time', 'isdeposit', 'origtotal', 'timer_start'), true)
+                    . print_r([$time > $charityDt->timer_expiry_timestamp], true)
+            );
+
             if ($isdeposit && $time > $charityDt->timer_expiry_timestamp) { // cap it; total_donation_amount remains its full total
                 $charityDt->timer_completed_at = $charityDt->timer_expiry_timestamp;
             } else { // in all other cases - timer was ended early; total needs to be reduced
                 $charityDt->timer_completed_at = $time;
                 $charityDt->total_donation_amount = calTotalDonationAmount($timer_start, $time, $charityDt->donation_amount, $charityDt->tick_frequency, $charityDt->tick_frequency_unit);
             }
+
+            Log::notice('2222222222222222222222222222 ' . print_r([
+                'charityDt->timer_completed_at' => $charityDt->timer_completed_at,
+                'charityDt->total_donation_amount' => $charityDt->total_donation_amount,
+            ], true));
+
             if ($isdeposit && $charityDt->charge) {
                 $stripe = Stripe::make(config('services.stripe.secret'));
                 $charge = $stripe->charges()->find($charityDt->charge);

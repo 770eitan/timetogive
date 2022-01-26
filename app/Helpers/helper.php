@@ -30,15 +30,13 @@ if (!function_exists('getSecondsFromTick')) {
 
 if (!function_exists('calTotalDonationAmount')) {
     // Calculate total donation
-    function calTotalDonationAmount($timer_start, $timer_completed_at, $donation_amount, $tick_frequency, $tick_frequency_unit)
+    function calTotalDonationAmount(Carbon $timer_start, Carbon $timer_completed_at, $donation_amount, $tick_frequency, $tick_frequency_unit)
     {
-        $startDate = Carbon::parse($timer_start);
-        $endDate = Carbon::parse($timer_completed_at);
         $data = [
-            's' => $startDate->diffInSeconds($endDate),
-            'h' => $startDate->diffInHours($endDate),
-            'm' => $startDate->diffInMinutes($endDate),
-            'd' => $startDate->diffInDays($endDate),
+            's' => $timer_start->diffInSeconds($timer_completed_at),
+            'h' => $timer_start->diffInHours($timer_completed_at),
+            'm' => $timer_start->diffInMinutes($timer_completed_at),
+            'd' => $timer_start->diffInDays($timer_completed_at),
         ];
         if ($timer_start && $timer_completed_at) {
             if ($tick_frequency_unit == 'sec') {

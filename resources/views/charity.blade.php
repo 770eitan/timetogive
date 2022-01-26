@@ -40,11 +40,10 @@
                 <div class="col-md-6 col-sm-12 text-left">
                     <ul class="list-group">
                         <li class="list-group-item">
-                            <strong>Start:</strong> <span data-time="{{ $timer_start }}" class="format-time"></span>
+                            <strong>Start:</strong> <span data-time="{{ $timer_start->getTimestampMs() }}" class="format-time"></span>
                         </li>
                         <li class="list-group-item">
-                            <strong>End:</strong> <span data-time="{{ $charity->timer_completed_at }}"
-                                class="format-time"></span>
+                            <strong>End:</strong> <span data-time="{{ $charity->timer_completed_at->getTimestampMs() }}" class="format-time"></span>
                         </li>
                         <li class="list-group-item">
                             <strong>Amount:</strong> {!! formatDonationAmountText($charity->donation_amount, $charity->tick_frequency, $charity->tick_frequency_unit, $charity->charity_organization) !!}
@@ -170,13 +169,13 @@
             // Update the count down every 1 second
             @if($charity->timer_expiry_timestamp)
                 //let countDownDate = new Date("{{ date('c', strtotime($charity->timer_expiry_timestamp)) }}").getTime();
-                let countDownDate = moment("{{ $charity->timer_expiry_timestamp }}").valueOf();
+                let countDownDate = new Date({{ $charity->timer_expiry_timestamp->getTimestampMs() }});
                 var ctTimer = setInterval(function() {
                     // Get today's date and time
                     // Find the distance between now and the count down date
                     // Get today's date and time
                     //var now = new Date().getTime();
-                    var now=moment().valueOf();
+                    var now=new Date();//moment().valueOf();
                 
                     // Find the distance between now and the count down date
                     var distance = countDownDate - now;
@@ -191,7 +190,7 @@
                     minutes + "m " + seconds + "s ";
                 
                     // If the count down is over, write some text
-                    if (distance < 0) {
+                    if (distance <= 0) {
                         clearInterval(ctTimer);
                         document.getElementById("expiry_time").innerHTML="Completed";
                         checkIsTimerExpire();

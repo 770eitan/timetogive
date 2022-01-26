@@ -52,7 +52,7 @@ class CharityTickerRepository
             $charityTicker = new CharityTicker;
             $charityTicker->user_id = $userId;
             if (config('timetogive.mode')=='countup' && !$request->has('is_subscribed')) { // for 'deposit' will calculate correct timer_expiry_timestamp upon email verification
-                $charityTicker->timer_expiry_timestamp = Carbon::createFromFormat('Y/m/d H:i', $data['timer_expiry_timestamp'])->format('Y-m-d H:i:s'); // user entered datetime - converted to timestamp
+                $charityTicker->timer_expiry_timestamp = Carbon::createFromFormat('Y/m/d H:i', $data['timer_expiry_timestamp']);//->format('Y-m-d H:i:s'); // user entered datetime - converted to timestamp
             } elseif (config('timetogive.mode')=='deposit') {
                 $charityTicker->total_donation_amount = (double)$data['total_donation_amount']; // TODO currency data type...
             }
@@ -243,7 +243,7 @@ class CharityTickerRepository
             $isdeposit = config('timetogive.mode') == 'deposit';
             $origtotal = $charityDt->total_donation_amount;
 
-            if ($isdeposit && "$time" > $charityDt->timer_expiry_timestamp) { // cap it; total_donation_amount remains its full total
+            if ($isdeposit && $time > $charityDt->timer_expiry_timestamp) { // cap it; total_donation_amount remains its full total
                 $charityDt->timer_completed_at = $charityDt->timer_expiry_timestamp;
             } else { // in all other cases - timer was ended early; total needs to be reduced
                 $charityDt->timer_completed_at = $time;
@@ -301,7 +301,7 @@ class CharityTickerRepository
                 // // echo $charityDt->timer_expiry_timestamp;
                 // // echo '--';
                 // // echo $time;
-                // $startDate = Carbon::parse($charityDt->timer_expiry_timestamp);
+                // $startDate = $charityDt->timer_expiry_timestamp; // Carbon::parse($charityDt->timer_expiry_timestamp);
                 // $endDate = Carbon::parse($time);
                 // if(!$startDate->gt($endDate)) {
                 //   $this->stopUserCharity($charity_code);

@@ -32,6 +32,9 @@ class CharityTicker extends Model
     protected $casts = [
         'donation_amount' => 'double',
         'total_donation_amount' => 'double',
+        'timer_start' => 'datetime',
+        'timer_expiry_timestamp' => 'datetime',
+        'timer_completed_at' => 'datetime',
     ];
 
     /**

@@ -243,10 +243,10 @@ class CharityTickerRepository
             $isdeposit = config('timetogive.mode') == 'deposit';
             $origtotal = $charityDt->total_donation_amount;
 
-            Log::notice('11111111111111111111111 '
-                . print_r(compact('user', 'charityDt', 'time', 'isdeposit', 'origtotal', 'timer_start'), true)
-                    . print_r([$time > $charityDt->timer_expiry_timestamp], true)
-            );
+            // Log::notice('11111111111111111111111 '
+            //     . print_r(compact('user', 'charityDt', 'time', 'isdeposit', 'origtotal', 'timer_start'), true)
+            //         . print_r([$time > $charityDt->timer_expiry_timestamp], true)
+            // );
 
             if ($isdeposit && $time > $charityDt->timer_expiry_timestamp) { // cap it; total_donation_amount remains its full total
                 $charityDt->timer_completed_at = $charityDt->timer_expiry_timestamp;
@@ -255,10 +255,10 @@ class CharityTickerRepository
                 $charityDt->total_donation_amount = calTotalDonationAmount($timer_start, $time, $charityDt->donation_amount, $charityDt->tick_frequency, $charityDt->tick_frequency_unit);
             }
 
-            Log::notice('2222222222222222222222222222 ' . print_r([
-                'charityDt->timer_completed_at' => $charityDt->timer_completed_at,
-                'charityDt->total_donation_amount' => $charityDt->total_donation_amount,
-            ], true));
+            // Log::notice('2222222222222222222222222222 ' . print_r([
+            //     'charityDt->timer_completed_at' => $charityDt->timer_completed_at,
+            //     'charityDt->total_donation_amount' => $charityDt->total_donation_amount,
+            // ], true));
 
             if ($isdeposit && $charityDt->charge) {
                 $stripe = Stripe::make(config('services.stripe.secret'));
@@ -268,11 +268,15 @@ class CharityTickerRepository
                     /////////////////////////////////////////////////////////////////////////////////////
                     //  Cartalyst\Stripe\Exception\MissingParameterException
                 } else if ($origtotal > $charityDt->total_donation_amount) { // needs to reduce / refund...
-                    $origfee = ($origtotal * 0.029) + 0.30;
-                    $wouldvbeenfee = ($charityDt->total_donation_amount * 0.029) + 0.30;
-                    $diffdontrefund = $origfee - $wouldvbeenfee;
+                    $origfee = round(($origtotal * 0.029) + 0.30, 2);
+                    $wouldvbeenfee = round(($charityDt->total_donation_amount * 0.029) + 0.30, 2);
+                    $diffdontrefund = round($origfee - $wouldvbeenfee, 2);
+                    $final_donation_amount = $charityDt->total_donation_amount;
                     $refund = $stripe->refunds()->create($charityDt->charge, $origtotal - $charityDt->total_donation_amount - $diffdontrefund, [
-                        'metadata' => array_merge(['reason' => 'stopped from TimeToGive'], compact('origtotal','origfee','wouldvbeenfee','diffdontrefund')),
+                        'metadata' => array_merge(
+                            ['reason' => 'stopped from TimeToGive'],
+                            compact('final_donation_amount','origtotal','origfee','wouldvbeenfee','diffdontrefund')
+                        ),
                         // 'reason' => 'requested_by_customer', // ?
                     ]);
                 }
@@ -306,7 +310,7 @@ class CharityTickerRepository
             }
             // If user entered expiry time and its not completed
             $timeText = '';
-            if ($charityDt->timer_expiry_timestamp && !$charityDt->timer_completed_at) {
+            if ($charityDt->timer_expiry_timestamp && !$charityDt->timer_completed_at && now() >= $charityDt->timer_expiry_timestamp) {
                 $this->stopUserCharity($charity_code); // TODO server-side check & confirm before stopping
                 // $time = now();
                 // // echo $charityDt->timer_expiry_timestamp;

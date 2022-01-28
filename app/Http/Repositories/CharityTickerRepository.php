@@ -243,7 +243,7 @@ class CharityTickerRepository
             $isdeposit = config('timetogive.mode') == 'deposit';
             $origtotal = $charityDt->total_donation_amount;
 
-            // Log::notice('11111111111111111111111 '
+            // \Log::notice('11111111111111111111111 '
             //     . print_r(compact('user', 'charityDt', 'time', 'isdeposit', 'origtotal', 'timer_start'), true)
             //         . print_r([$time > $charityDt->timer_expiry_timestamp], true)
             // );
@@ -255,7 +255,7 @@ class CharityTickerRepository
                 $charityDt->total_donation_amount = calTotalDonationAmount($timer_start, $time, $charityDt->donation_amount, $charityDt->tick_frequency, $charityDt->tick_frequency_unit);
             }
 
-            // Log::notice('2222222222222222222222222222 ' . print_r([
+            // \Log::notice('2222222222222222222222222222 ' . print_r([
             //     'charityDt->timer_completed_at' => $charityDt->timer_completed_at,
             //     'charityDt->total_donation_amount' => $charityDt->total_donation_amount,
             // ], true));
@@ -281,7 +281,7 @@ class CharityTickerRepository
                     ]);
                 }
             } else {
-                Log::error('Unexpected #9487948 - missing charge??', compact('user','charityDt','origtotal','isdeposit','time'));
+                \Log::error('Unexpected #9487948 - missing charge??', compact('user','charityDt','origtotal','isdeposit','time'));
             }
 
             $charityDt->save();

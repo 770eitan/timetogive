@@ -55,11 +55,11 @@ class AppServiceProvider extends ServiceProvider
             }
 
 
-            \Log::notice("Queue::after {$payload['data']['commandName']} - dispatching ScheduleExpireCharities::dispatch");
+            // \Log::notice("Queue::after {$payload['data']['commandName']} - dispatching ScheduleExpireCharities::dispatch");
 
             \App\Jobs\ScheduleExpireCharities::dispatch();
             
-            \Log::notice("Queue::after {$payload['data']['commandName']} - dispatched ScheduleExpireCharities");
+            // \Log::notice("Queue::after {$payload['data']['commandName']} - dispatched ScheduleExpireCharities");
 
         });
     }

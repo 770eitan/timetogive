@@ -221,11 +221,11 @@ class CharityTickerRepository
      *
      * @return Collection CharityTicker
      */
-    public function stopUserCharity($charity_code)
+    public function stopUserCharity($charity_code, $usr = null)
     {
         DB::beginTransaction();
         try {
-            $user = Auth::user();
+            $user = Auth::user() ?: $usr;
             $userId = $user->id;
             $charityDt = CharityTicker::where(['charity_code' => $charity_code, 'user_id' => $userId])->first();
             if (!$charityDt) {

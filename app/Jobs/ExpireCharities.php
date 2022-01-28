@@ -10,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Http\Repositories\CharityTickerRepository;
 use App\Models\CharityTicker;
+use App\Models\User;
 
 class ExpireCharities implements ShouldQueue, ShouldBeUnique
 {
@@ -66,7 +67,8 @@ class ExpireCharities implements ShouldQueue, ShouldBeUnique
         //             end
         //         ))) < extract(epoch from now())")->update([...................................])
 
-        array_map([$charityTickerRepo, 'stopUserCharity'], CharityTicker::where('timer_start', '>', new \Carbon\Carbon(0))
+
+        $charities = CharityTicker::where('timer_start', '>', new \Carbon\Carbon(0))
             ->where(function($query){
                 $query->whereNull('timer_completed_at')->orWhereRaw('(not ("timer_completed_at" > to_timestamp(0)))');
             })
@@ -75,9 +77,13 @@ class ExpireCharities implements ShouldQueue, ShouldBeUnique
             ->where('tick_frequency','>',0)
             ->whereIn('tick_frequency_unit', ['sec','mins','hours','days'])
             ->whereRaw('now() >= "timer_expiry_timestamp"')
-            ->pluck('charity_code')
-            ->all()
-        );
+            ->pluck('charity_code','user_id')
+            ->all();
+        $ids = array_keys($charities);
+        
+        array_map([$charityTickerRepo, 'stopUserCharity'], array_values($charities), User::whereIn('id', $ids)->orderByRaw('case '.implode(' ',array_map(fn($id, $ord) => "when id = $id then $ord", $ids, range(0, count($ids)-1))).' end')->get()->all());
+
+
             // ->update(['timer_completed_at' => \DB::raw('"timer_expiry_timestamp"')]);
             // ->whereRaw("extract(epoch from now()) >= (extract(epoch from timer_start) + ((total_donation_amount * 100) / (donation_amount * 100)) * (tick_frequency * (
             //         case

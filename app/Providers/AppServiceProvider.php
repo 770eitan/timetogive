@@ -44,9 +44,9 @@ class AppServiceProvider extends ServiceProvider
         
         \Queue::after(function (JobProcessed $event) {
             // print_r($event->job);
-            \Log::notice('11111111111111122222222233333333333333333333');
+            // \Log::notice('11111111111111122222222233333333333333333333');
             $payload = $event->job->payload();
-            print_r($payload);
+            // print_r($payload);
             // $event->connectionName
             // $event->job
             // $event->job->payload()
@@ -55,11 +55,11 @@ class AppServiceProvider extends ServiceProvider
             }
 
 
-            \Log::notice("Queue::after {$payload['commandName']} - dispatching ScheduleExpireCharities::dispatch");
+            \Log::notice("Queue::after {$payload['data']['commandName']} - dispatching ScheduleExpireCharities::dispatch");
 
             \App\Jobs\ScheduleExpireCharities::dispatch();
             
-            \Log::notice("Queue::after {$payload['commandName']} - dispatched ScheduleExpireCharities");
+            \Log::notice("Queue::after {$payload['data']['commandName']} - dispatched ScheduleExpireCharities");
 
         });
     }

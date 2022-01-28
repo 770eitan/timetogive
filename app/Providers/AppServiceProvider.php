@@ -50,7 +50,7 @@ class AppServiceProvider extends ServiceProvider
             // $event->connectionName
             // $event->job
             // $event->job->payload()
-            if ( strpos( $payload['commandName'], 'App\\Jobs\\ExpireCharities' ) === false ) {
+            if ( strpos( $payload['data']['commandName'], 'App\\Jobs\\ExpireCharities' ) === false ) {
                 return;
             }
 

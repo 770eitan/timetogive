@@ -6,7 +6,6 @@ use App\Http\Repositories\CharityTickerRepository;
 use App\Http\Requests\CreateCharitySearchRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Session;
 
 class HomeController extends Controller

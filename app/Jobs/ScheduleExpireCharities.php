@@ -32,8 +32,8 @@ class ScheduleExpireCharities implements ShouldQueue
     {
         //
         
-        Log::notice("ScheduleExpireCharities::handle - dispatching ExpireCharities delayed...");
+        \Log::notice("ScheduleExpireCharities::handle - dispatching ExpireCharities delayed...");
         \App\Jobs\ExpireCharities::dispatch()->delay(now()->addMinutes(1));
-        Log::notice("ScheduleExpireCharities::handle - dispatched ExpireCharities");
+        \Log::notice("ScheduleExpireCharities::handle - dispatched ExpireCharities");
     }
 }

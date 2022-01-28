@@ -43,7 +43,8 @@ class AppServiceProvider extends ServiceProvider
 
         
         \Queue::after(function (JobProcessed $event) {
-            print_r($event->job);
+            // print_r($event->job);
+            Log::notice('11111111111111122222222233333333333333333333');
             $payload = $event->job->payload();
             print_r($payload);
             // $event->connectionName

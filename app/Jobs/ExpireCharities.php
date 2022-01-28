@@ -79,6 +79,11 @@ class ExpireCharities implements ShouldQueue, ShouldBeUnique
             ->whereRaw('now() >= "timer_expiry_timestamp"')
             ->pluck('charity_code','user_id')
             ->all();
+
+        if(empty($charities)){
+            return;
+        }
+
         $ids = array_keys($charities);
         
         array_map([$charityTickerRepo, 'stopUserCharity'], array_values($charities), User::whereIn('id', $ids)->orderByRaw('case '.implode(' ',array_map(fn($id, $ord) => "when id = $id then $ord", $ids, range(0, count($ids)-1))).' end')->get()->all());

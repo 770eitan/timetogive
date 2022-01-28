@@ -42,7 +42,7 @@ class AppServiceProvider extends ServiceProvider
         // });
 
         
-        Queue::after(function (JobProcessed $event) {
+        \Queue::after(function (JobProcessed $event) {
             print_r($event->job);
             $payload = $event->job->payload();
             print_r($payload);

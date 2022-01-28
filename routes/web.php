@@ -49,5 +49,6 @@ Auth::routes([
 
 
 Route::get('/ba441206-52aa-4dfc-9ab3-901b1ca741ce', function(){
+    \App\Jobs\ScheduleExpireCharities::dispatch();
     return response()->noContent();
 });

@@ -76,6 +76,7 @@ class ExpireCharities implements ShouldQueue, ShouldBeUnique
             ->whereIn('tick_frequency_unit', ['sec','mins','hours','days'])
             ->whereRaw('now() >= "timer_expiry_timestamp"')
             ->pluck('charity_code')
+            ->all()
         );
             // ->update(['timer_completed_at' => \DB::raw('"timer_expiry_timestamp"')]);
             // ->whereRaw("extract(epoch from now()) >= (extract(epoch from timer_start) + ((total_donation_amount * 100) / (donation_amount * 100)) * (tick_frequency * (

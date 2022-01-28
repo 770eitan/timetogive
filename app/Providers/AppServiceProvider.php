@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Queue\Events\JobProcessed;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,21 +24,42 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-      if(config('app.env') !== 'local') { 
-        $this->app['request']->server->set('HTTPS',true); 
-      }
+        if(config('app.env') !== 'local') { 
+            $this->app['request']->server->set('HTTPS',true); 
+        }
       
-      // Validator::extend('checks_out', function($attribute, $value, $parameters, $validator) {
-      //   // $min_field = $parameters[0];
-      //   in_array($attribute, ['donation_amount', 'tick_frequency', 'tick_frequency_unit', 'total_donation_amount']);
-      //   empty(array_diff($parameters, ['donation_amount', 'tick_frequency', 'tick_frequency_unit', 'total_donation_amount']));
-      //   $data = $validator->getData();
-      //   // $min_value = $data[$min_field];
+        // Validator::extend('checks_out', function($attribute, $value, $parameters, $validator) {
+        //   // $min_field = $parameters[0];
+        //   in_array($attribute, ['donation_amount', 'tick_frequency', 'tick_frequency_unit', 'total_donation_amount']);
+        //   empty(array_diff($parameters, ['donation_amount', 'tick_frequency', 'tick_frequency_unit', 'total_donation_amount']));
+        //   $data = $validator->getData();
+        //   // $min_value = $data[$min_field];
 
-      //   $data['donation_amount'] * 
+        //   $data['donation_amount'] * 
 
 
-      //   return $value > $min_value;
-      // });
+        //   return $value > $min_value;
+        // });
+
+        
+        Queue::after(function (JobProcessed $event) {
+            print_r($event->job);
+            $payload = $event->job->payload();
+            print_r($payload);
+            // $event->connectionName
+            // $event->job
+            // $event->job->payload()
+            if ( strpos( $payload['commandName'], 'App\\Jobs\\ExpireCharities' ) === false ) {
+                return;
+            }
+
+
+            Log::notice("Queue::after {$payload['commandName']} - dispatching ScheduleExpireCharities::dispatch");
+
+            \App\Jobs\ScheduleExpireCharities::dispatch();
+            
+            Log::notice("Queue::after {$payload['commandName']} - dispatched ScheduleExpireCharities");
+
+        });
     }
 }

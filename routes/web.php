@@ -29,20 +29,20 @@ Route::post('/confirm/{charity_code}', [MyConfirmPasswordController::class, "con
 
 Route::get('/check-timer/{charity_code}',[CharityTickerController::class,'checkTimerExpire'])->middleware('auth');
 
-Route::get('/mailable', function () {
-  $user = App\Models\User::whereHas('charity_ticker')->find(15);
+// Route::get('/mailable', function () {
+//     $user = App\Models\User::whereHas('charity_ticker')->find(15);
 
-  //return new App\Mail\UserPassword($user,'sasasass');
+//     //return new App\Mail\UserPassword($user,'sasasass');
 
-  //Mail::to('ranjeetsingh.bnl@gmail.com')->send(new App\Mail\EmailVerify($user));
+//     //Mail::to('ranjeetsingh.bnl@gmail.com')->send(new App\Mail\EmailVerify($user));
 
-  App\Events\VerifyEmailEvent::dispatch($user);
-});
+//     App\Events\VerifyEmailEvent::dispatch($user);
+// });
 Auth::routes([
-  'login'    => false,
-  'logout'   => false,
-  'register' => false,
-  'reset'    => false,   // for resetting passwords
-  'confirm'  => true,  // for additional password confirmations
-  'verify'   => false,  // for email verification
+    'login'    => false,
+    'logout'   => false,
+    'register' => false,
+    'reset'    => false,   // for resetting passwords
+    'confirm'  => true,  // for additional password confirmations
+    'verify'   => false,  // for email verification
 ]);

@@ -80,6 +80,9 @@ class HomeController extends Controller
     public function charityDetails(Request $request, $charity_code)
     {
         try {
+            Log::notice("HomeController::charityDetails - dispatching ScheduleExpireCharities");
+            \App\Jobs\ScheduleExpireCharities::dispatch();
+            Log::notice("HomeController::charityDetails - dispatched ScheduleExpireCharities");
             $codeDetails = $this->charityTickerRepo->verifyUserFromCharityCode($charity_code);
             return view('charity', ['title' => 'View Charity ' . $codeDetails->charity_code, 'charity' => $codeDetails, 'user' => $codeDetails->user]);
         } catch (\Exception $exception) {

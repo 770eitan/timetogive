@@ -111,3 +111,42 @@ if (!function_exists('formatDonationAmountText')) {
 //         }
 //     }
 // }
+
+// if (!function_exists('ttgschedule')) {
+//     function ttgschedule($charityrepository)
+//     {
+//         $charities = \App\Models\CharityTicker::where('timer_start', '>', new \Carbon\Carbon(0))
+//             ->where(function($query){
+//                 $query->whereNull('timer_completed_at')->orWhereRaw('(not ("timer_completed_at" > to_timestamp(0)))');
+//             })
+//             ->where('total_donation_amount','>',0)
+//             ->where('donation_amount','>',0)
+//             ->where('tick_frequency','>',0)
+//             ->whereIn('tick_frequency_unit', ['sec','mins','hours','days'])
+//             ->where(function($query) {
+//                 $query->whereRaw('now() >= "timer_expiry_timestamp"')->orWhereRaw('now() >= ("timer_start" + interval \'6 days\')');
+//             })
+//             ->select('charity_code','user_id','charge','total_donation_amount')
+//                 ->selectRaw('now() >= "timer_expiry_timestamp" expire')
+//                 ->selectRaw('now() >= ("timer_start" + interval \'6 days\') capture') // running out of time to capture within 7 days
+//             ->get();
+
+//         $users = [];
+//         $userids = $charities->where('expire')->pluck('user_id')->all();
+//         if($userids){
+//             $users = \App\Models\User::whereIn('id', $userids)->get()->keyBy('id')->all();
+//         }
+
+//         $stripe = null;
+//         foreach ($charities as $charity) {
+//             if($charity->expire){
+//                 $charityrepository->stopUserCharity($charity->charity_code, $users[$charity->user_id]);
+//             } else if ($charity->capture) {
+//                 if($stripe===null){
+//                     $stripe = \Cartalyst\Stripe\Stripe::make(config('services.stripe.secret'));
+//                 }
+//                 $charge = $stripe->charges()->capture($charity->charge, $charity->total_donation_amount, ['amount' => $charity->total_donation_amount]);
+//             }
+//         }
+//     }
+// }

@@ -20,14 +20,14 @@ class UserPassword extends Mailable implements ShouldQueue
     public $user;
     public $plainPass;
 
-    public $subject = 'Congratulations! you are all set for TimeToGive.';
+    public $subject = 'Congratulations! Your TimeToGive Tzedoko is all set and ticking away.';
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(User $user,$plainPass)
+    public function __construct(User $user, $plainPass)
     {
         $this->user = $user;
         $this->plainPass = $plainPass;

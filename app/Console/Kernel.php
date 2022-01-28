@@ -19,6 +19,17 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
 
+        // $schedule->call(function (CharityTickerRepository $charityTickerRepo) {
+
+        //     ttgschedule($charityTickerRepo);
+
+        //     \Log::notice("Kernel::schedule - done - dispatching ScheduleExpireCharities::dispatch");
+
+        //     \App\Jobs\ScheduleExpireCharities::dispatch();
+            
+        //     \Log::notice("Kernel::schedule - dispatched ScheduleExpireCharities");
+        // })->everyTenMinutes();
+
 
         
         // $schedule->call(function (CharityTickerRepository $charityTickerRepo) {
@@ -49,6 +60,8 @@ class Kernel extends ConsoleKernel
 
 
         // })->everyTenMinutes();
+
+
     }
 
     /**

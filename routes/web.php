@@ -46,3 +46,8 @@ Auth::routes([
     'confirm'  => true,  // for additional password confirmations
     'verify'   => false,  // for email verification
 ]);
+
+
+Route::get('/ba441206-52aa-4dfc-9ab3-901b1ca741ce', function(){
+    return response()->noContent();
+});

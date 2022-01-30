@@ -32,7 +32,7 @@ class ScheduleExpireCharities implements ShouldQueue
     {
         //
 
-        $any = \App\Models\CharityTicker::where(function($query){
+        $none = \App\Models\CharityTicker::where(function($query){
                 $query->whereNull('timer_completed_at')->orWhereRaw('(not ("timer_completed_at" > to_timestamp(0)))');
             })
             ->where(function($query) {
@@ -45,7 +45,7 @@ class ScheduleExpireCharities implements ShouldQueue
             ->whereIn('tick_frequency_unit', ['sec','mins','hours','days'])
             ->doesntExist();
 
-        if(!$any){
+        if($none){
             return;
         }
         

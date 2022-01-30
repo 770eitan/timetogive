@@ -36,7 +36,7 @@ class ScheduleExpireCharities implements ShouldQueue
                 $query->whereNull('timer_completed_at')->orWhereRaw('(not ("timer_completed_at" > to_timestamp(0)))');
             })
             ->where('timer_start', '>', new \Carbon\Carbon(0))
-            ->whereRaw('timer_expiry_timestamp > timer_start')
+            ->whereColumn('timer_expiry_timestamp', '>', 'timer_start')
             ->where('total_donation_amount','>',0)
             ->where('donation_amount','>',0)
             ->where('tick_frequency','>',0)
